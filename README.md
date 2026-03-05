@@ -1,168 +1,136 @@
-# Premium Jobs - Локальная установка
+Premium Jobs — Local Setup
+🎉 Project successfully migrated from Docker!
+📍 System access:
 
-## 🎉 Проект успешно мигрирован из Docker!
+🌐 Website (public part):
 
-### 📍 Доступ к системе:
+http://localhost:8069
 
-**🌐 Сайт (публичная часть):**
-- http://localhost:8069
+🔐 CRM (admin panel):
 
-**🔐 CRM (административная панель):**
-- http://localhost:8069/web
-- http://localhost:8069/web/login
+http://localhost:8069/web
 
-### 👤 Данные для входа:
-- **Email:** admin
-- **Пароль:** (ваш текущий пароль из базы данных)
+http://localhost:8069/web/login
 
----
+👤 Login credentials:
 
-## 🚀 Управление системой
+Email: admin
 
-### Запуск Odoo:
-```bash
+Password: (your current password from the database)
+
+🚀 System management
+Start Odoo:
 cd /Users/dimalivshitz/Documents/DEVPROJ/Premium\ Jobs/PROJECT
 ./start_odoo.sh
-```
-
-### Остановка Odoo:
-```bash
-# Нажмите Ctrl+C в терминале где запущен Odoo
-# Или найдите процесс и остановите:
+Stop Odoo:
+# Press Ctrl+C in the terminal where Odoo is running
+# Or find the process and stop it:
 pkill -f "odoo-bin"
-```
-
-### Перезапуск с обновлением модуля:
-```bash
+Restart and update a module:
 cd /Users/dimalivshitz/Documents/DEVPROJ/Premium\ Jobs/PROJECT
 ./start_odoo.sh -u premium_jobs
-```
-
----
-
-## 📁 Структура проекта
-
-```
+📁 Project structure
 PROJECT/
-├── odoo_source/          # Исходный код Odoo 17
-├── addons/               # Кастомные модули
-│   ├── premium_jobs/     # Основной модуль CRM
-│   └── web_overrides/    # Переопределение веб-интерфейса
-├── filestore/            # Файлы и изображения
-│   └── premium_jobs/     # Filestore базы данных
-├── database/             # Бэкапы базы данных
+├── odoo_source/          # Odoo 17 source code
+├── addons/               # Custom modules
+│   ├── premium_jobs/     # Main CRM module
+│   └── web_overrides/    # Web interface overrides
+├── filestore/            # Files and images
+│   └── premium_jobs/     # Database filestore
+├── database/             # Database backups
 │   └── premium_jobs_export.sql
-├── config/               # Конфигурация
-│   └── odoo.conf         # Настройки Odoo
-├── logs/                 # Логи
-│   └── odoo.log          # Основной лог файл
-├── odoo_venv/            # Python виртуальное окружение
-└── start_odoo.sh         # Скрипт запуска
-```
+├── config/               # Configuration
+│   └── odoo.conf         # Odoo settings
+├── logs/                 # Logs
+│   └── odoo.log          # Main log file
+├── odoo_venv/            # Python virtual environment
+└── start_odoo.sh         # Startup script
+🛠 Technical information
+Database:
 
----
+PostgreSQL: localhost:5432
 
-## 🛠 Техническая информация
+Database: premium_jobs_local
 
-### База данных:
-- **PostgreSQL:** localhost:5432
-- **Database:** premium_jobs_local
-- **User:** premium_jobs_user
-- **Password:** premium123
+User: premium_jobs_user
 
-### Python окружение:
-- **Версия Python:** 3.13
-- **Виртуальное окружение:** `/PROJECT/odoo_venv/`
-- **Все зависимости установлены**
+Password: premium123
 
-### Логи:
-- **Odoo logs:** `/PROJECT/logs/odoo.log`
-- **Уровень логирования:** info
+Python environment:
 
----
+Python version: 3.13
 
-## 📝 Полезные команды
+Virtual environment: /PROJECT/odoo_venv/
 
-### Создать новую базу данных:
-```bash
+All dependencies installed
+
+Logs:
+
+Odoo logs: /PROJECT/logs/odoo.log
+
+Logging level: info
+
+📝 Useful commands
+Create a new database:
 psql postgres -c "CREATE DATABASE new_db OWNER premium_jobs_user;"
-```
-
-### Бэкап базы данных:
-```bash
+Database backup:
 pg_dump -U premium_jobs_user premium_jobs_local > backup_$(date +%Y%m%d).sql
-```
-
-### Восстановление базы:
-```bash
+Restore database:
 psql -U premium_jobs_user premium_jobs_local < backup.sql
-```
-
-### Просмотр логов в реальном времени:
-```bash
+View logs in real time:
 tail -f /Users/dimalivshitz/Documents/DEVPROJ/Premium\ Jobs/PROJECT/logs/odoo.log
-```
-
-### Установка дополнительных Python пакетов:
-```bash
+Install additional Python packages:
 source /Users/dimalivshitz/Documents/DEVPROJ/Premium\ Jobs/PROJECT/odoo_venv/bin/activate
 pip install package_name
-```
+⚙️ Configuration (odoo.conf)
 
----
+Main settings are located in /PROJECT/config/odoo.conf:
 
-## ⚙️ Конфигурация (odoo.conf)
+Port: 8069
 
-Основные настройки находятся в `/PROJECT/config/odoo.conf`:
-- **Порт:** 8069
-- **Addons paths:** Odoo стандартные + кастомные модули
-- **Data directory:** `/PROJECT/filestore/`
-- **Workers:** 0 (для разработки)
+Addons paths: Odoo standard + custom modules
 
----
+Data directory: /PROJECT/filestore/
 
-## 🔧 Разработка
+Workers: 0 (development mode)
 
-### Редактирование кода:
-Все кастомные модули находятся в:
-```
+🔧 Development
+Editing the code:
+
+All custom modules are located in:
+
 /PROJECT/addons/premium_jobs/
 /PROJECT/addons/web_overrides/
-```
+After changing the code:
 
-### После изменения кода:
-1. Перезапустите Odoo с флагом `-u module_name`
-2. Или обновите через веб-интерфейс: Apps → Update Apps List
+Restart Odoo with the -u module_name flag
 
----
+Or update via the web interface: Apps → Update Apps List
 
-## ✅ Что было перенесено:
+✅ What was migrated:
 
-✓ База данных (30MB)
-✓ Все кастомные модули (premium_jobs, web_overrides)
-✓ Filestore (все загруженные файлы)
-✓ Конфигурация Odoo
-✓ Python зависимости
+✓ Database (30MB)
+✓ All custom modules (premium_jobs, web_overrides)
+✓ Filestore (all uploaded files)
+✓ Odoo configuration
+✓ Python dependencies
 
----
+🚨 Important:
 
-## 🚨 Важно:
+Docker is no longer required — everything runs locally
 
-1. **Docker больше не нужен** - всё работает локально
-2. **PostgreSQL должен быть запущен** - проверьте: `brew services list`
-3. **Виртуальное окружение активируется автоматически** через start_odoo.sh
-4. **Порт 8069 должен быть свободен** - закройте другие Odoo инстансы
+PostgreSQL must be running — check with: brew services list
 
----
+The virtual environment is activated automatically via start_odoo.sh
 
-## 📞 Поддержка:
+Port 8069 must be free — close other Odoo instances
 
-Если возникли проблемы:
-1. Проверьте логи: `tail -50 /PROJECT/logs/odoo.log`
-2. Убедитесь что PostgreSQL запущен: `brew services list`
-3. Проверьте порт: `lsof -i :8069`
+📞 Support / Troubleshooting:
 
----
+If you run into issues:
 
-**Система полностью готова к работе! 🎊**
+Check logs: tail -50 /PROJECT/logs/odoo.log
 
+Ensure PostgreSQL is running: brew services list
+
+Check the port: lsof -i :8069
