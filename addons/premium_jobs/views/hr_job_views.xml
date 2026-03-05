@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <record id="hr_job_simple_form_inherit" model="ir.ui.view">
+            <field name="name">hr.job.simple.form.inherit</field>
+            <field name="model">hr.job</field>
+            <field name="inherit_id" ref="hr_recruitment.hr_job_simple_form"/>
+            <field name="arch" type="xml">
+                <form position="attributes">
+                    <attribute name="class">o_hr_job_simple_form</attribute>
+                    <attribute name="dir">rtl</attribute>
+                </form>
+                <label for="alias_name" position="replace"/>
+                <div name="alias_def" position="replace"/>
+                
+                <field name="name" position="replace">
+                    
+                    <!-- Section 1: Job Details -->
+                    <group string="פרטי משרה" class="job_section part1 partisi" col="1">
+                        <div class="field_wrapper">
+                            <label for="tenant_id" string="שם הלקוח" class="o_form_label o_required_modifier"/>
+                            <field name="tenant_id" nolabel="1" required="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="address_id" string="מיקום משרה" class="o_form_label"/>
+                            <field name="address_id" nolabel="1"/>
+                            <field name="address_display" nolabel="1" readonly="1" class="text-muted small" invisible="not address_id"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="name" string="תפקיד" class="o_form_label"/>
+                            <field name="name" nolabel="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="closed_date" string="תאריך סגירה" class="o_form_label"/>
+                            <field name="closed_date" nolabel="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="main_category_id" string="סוג משרה ראשי" class="o_form_label o_required_modifier"/>
+                            <field name="main_category_id" nolabel="1" required="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="additional_category_ids" string="סוגי משרה נוספים" class="o_form_label"/>
+                            <field name="additional_category_ids" nolabel="1" widget="many2many_tags"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="sendto_contact_ids" string="אנשי קשר" class="o_form_label o_required_modifier"/>
+                            <field name="sendto_contact_ids" nolabel="1" widget="many2many_tags" required="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="client_title" string="כותרת" class="o_form_label o_required_modifier"/>
+                            <field name="client_title" nolabel="1" required="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="internal_description" string="תיאור משרה" class="o_form_label o_required_modifier"/>
+                            <field name="internal_description" nolabel="1" required="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="internal_notes" string="הערה פנימית" class="o_form_label"/>
+                            <field name="internal_notes" nolabel="1"/>
+                        </div>
+                        <div class="field_wrapper checkbox_wrapper">
+                            <div class="o_row">
+                                <field name="show_internal_notes" class="oe_inline"/>
+                                <label for="show_internal_notes" string="הצג הערה פנימית בסינון ראשוני"/>
+                            </div>
+                        </div>
+                    </group>
+                    
+                    <!-- Section 2: Requirements -->
+                    <group string="פרמטרים מבוקשים" class="job_section  part2 partisi" col="1">
+                        <div class="field_wrapper">
+                            <label for="marital_status_requirement" string="מצב משפחתי" class="o_form_label"/>
+                            <field name="marital_status_requirement" nolabel="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="mobility_required" string="ניידות" class="o_form_label"/>
+                            <field name="mobility_required" nolabel="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="mobility_or_license" string="ניידות/רשיון" class="o_form_label"/>
+                            <field name="mobility_or_license" nolabel="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="driver_license_required" string="רישיון נהיגה" class="o_form_label"/>
+                            <field name="driver_license_required" nolabel="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="gender_requirement" string="מין" class="o_form_label"/>
+                            <field name="gender_requirement" nolabel="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="no_gender" string="כולל מועמדים שמינם אינו ידוע" class="o_form_label"/>
+                            <field name="no_gender" nolabel="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="age_min" string="גיל (מינ-מקס)" class="o_form_label"/>
+                            <div class="o_row">
+                                <field name="age_min" class="oe_inline" nolabel="1"/>
+                                <span> - </span>
+                                <field name="age_max" class="oe_inline" nolabel="1"/>
+                                <field name="no_age" class="oe_inline"/>
+                            </div>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="min_wage" string="שכר (מינ-מקס)" class="o_form_label"/>
+                            <div class="o_row">
+                                <field name="min_wage" class="oe_inline" nolabel="1"/>
+                                <span> - </span>
+                                <field name="max_wage" class="oe_inline" nolabel="1"/>
+                                <field name="no_wage" class="oe_inline"/>
+                            </div>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="freelancer_reward" string="תגמול לפרילנסר ₪" class="o_form_label"/>
+                            <field name="freelancer_reward" nolabel="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="expire_days" string="תוקף (ימים)" class="o_form_label"/>
+                            <field name="expire_days" nolabel="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="norepeat_months" string="חזרה (חודשים)" class="o_form_label"/>
+                            <field name="norepeat_months" nolabel="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="full_cv" string="רק מועמדים עם קורות חיים" class="o_form_label"/>
+                            <field name="full_cv" nolabel="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="hebrew_cv" string="רק מועמדים עם קורות חיים בעברית" class="o_form_label"/>
+                            <field name="hebrew_cv" nolabel="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="crossreferral" string="הצלבת הפניות" class="o_form_label"/>
+                            <field name="crossreferral" nolabel="1"/>
+                        </div>
+                        
+                        <separator string="סינון מועמדים לפי שליטה מינימלית בשפות" colspan="2"/>
+                        <div class="language_grid">
+                            <div class="field_wrapper">
+                                <label for="lang_hebrew" string="עברית" class="o_form_label"/>
+                                <field name="lang_hebrew" nolabel="1"/>
+                            </div>
+                            <div class="field_wrapper">
+                                <label for="lang_english" string="אנגלית" class="o_form_label"/>
+                                <field name="lang_english" nolabel="1"/>
+                            </div>
+                            <div class="field_wrapper">
+                                <label for="lang_arabic" string="ערבית" class="o_form_label"/>
+                                <field name="lang_arabic" nolabel="1"/>
+                            </div>
+                            <div class="field_wrapper">
+                                <label for="lang_russian" string="רוסית" class="o_form_label"/>
+                                <field name="lang_russian" nolabel="1"/>
+                            </div>
+                            <div class="field_wrapper">
+                                <label for="lang_spanish" string="ספרדית" class="o_form_label"/>
+                                <field name="lang_spanish" nolabel="1"/>
+                            </div>
+                            <div class="field_wrapper">
+                                <label for="lang_french" string="צרפתית" class="o_form_label"/>
+                                <field name="lang_french" nolabel="1"/>
+                            </div>
+                            <div class="field_wrapper">
+                                <label for="lang_amharic" string="אמהרית" class="o_form_label"/>
+                                <field name="lang_amharic" nolabel="1"/>
+                            </div>
+                        </div>
+                    </group>
+                    
+                    <!-- Section 3: Administration -->
+                    <group string="עדכון אדמיניסטרטיביים" class="job_section  part3 partisi" col="1">
+                        <div class="field_wrapper">
+                            <label for="job_level" string="רמת סינון ראשוני" class="o_form_label"/>
+                            <field name="job_level" nolabel="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="refer_channel" string="שיטת שליחה" class="o_form_label"/>
+                            <field name="refer_channel" nolabel="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="referfail" string="שליחה מתיקון" class="o_form_label"/>
+                            <field name="referfail" nolabel="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="sales_admin_id" string="רכז מטפל" class="o_form_label"/>
+                            <field name="sales_admin_id" nolabel="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="oper_admin_id" string="רכז גיוס" class="o_form_label"/>
+                            <field name="oper_admin_id" nolabel="1"/>
+                        </div>
+                        <div class="field_wrapper full-width">
+                            <label for="more_admins_ids" string="רכזים נוספים" class="o_form_label"/>
+                            <field name="more_admins_ids" nolabel="1" widget="many2many_tags"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="openings" string="תקנים פתוחים" class="o_form_label"/>
+                            <field name="openings" nolabel="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="is_urgent" string="משרה דחופה" class="o_form_label"/>
+                            <field name="is_urgent" nolabel="1"/>
+                        </div>
+                        <div class="field_wrapper">
+                            <label for="hide_candidate_data" string="הסתר פרטי מועמד" class="o_form_label"/>
+                            <field name="hide_candidate_data" nolabel="1"/>
+                        </div>
+                    </group>
+                    
+                </field>
+                
+                <!-- Футер внизу формы -->
+                <footer position="replace">
+                    <button string="צור משרה" type="object" name="close_dialog" class="btn-primary o_create_job" data-hotkey="q"/>
+                    <button string="בטל" class="btn-secondary" special="cancel" data-hotkey="x"/>
+                </footer>
+                
+            </field>
+        </record>
+        
+        <!-- Наследование основной формы просмотра вакансии -->
+        <record id="view_hr_job_form_inherit_premium" model="ir.ui.view">
+            <field name="name">hr.job.form.inherit.premium</field>
+            <field name="model">hr.job</field>
+            <field name="inherit_id" ref="hr.view_hr_job_form"/>
+            <field name="arch" type="xml">
+                
+                <!-- Добавляем placeholder для description -->
+                <field name="description" position="attributes">
+                    <attribute name="placeholder">תיאור המשרה, דרישות, אחריות, תנאים...</attribute>
+                </field>
+                
+                <!-- Добавляем основные поля после department_id -->
+                <field name="department_id" position="after">
+                    <field name="tenant_id" string="שם הלקוח"/>
+                    <field name="closed_date" string="תאריך סגירה"/>
+                    <field name="main_category_id" string="סוג משרה ראשי"/>
+                    <field name="additional_category_ids" widget="many2many_tags" string="סוגי משרה נוספים"/>
+                    <field name="sendto_contact_ids" widget="many2many_tags" string="אנשי קשר"/>
+                </field>
+                
+                <!-- Добавляем notebook с вкладками после стандартных полей -->
+                <xpath expr="//notebook" position="inside">
+                    
+                    <!-- תיאורים והערות -->
+                    <page string="תיאורים והערות">
+                        <group>
+                            <field name="client_title" string="כותרת"/>
+                            <field name="internal_description" string="תיאור משרה פנימי" widget="text"/>
+                            <field name="internal_notes" string="הערה פנימית" widget="text"/>
+                            <field name="show_internal_notes" string="הצג הערה פנימית בסינון ראשוני"/>
+                        </group>
+                    </page>
+                    
+                    <!-- דרישות מועמדים -->
+                    <page string="דרישות מועמדים">
+                        <group>
+                            <group string="דרישות כלליות">
+                                <field name="marital_status_requirement" string="מצב משפחתי"/>
+                                <field name="gender_requirement" string="מין"/>
+                                <field name="no_gender" string="כולל מינם אינו ידוע"/>
+                                <field name="mobility_required" string="ניידות"/>
+                                <field name="mobility_or_license" string="ניידות/רשיון"/>
+                                <field name="driver_license_required" string="רישיון נהיגה"/>
+                            </group>
+                            <group string="גיל ושכר">
+                                <label for="age_min" string="גיל"/>
+                                <div class="o_row">
+                                    <field name="age_min" class="oe_inline" placeholder="מינ"/>
+                                    <span> - </span>
+                                    <field name="age_max" class="oe_inline" placeholder="מקס"/>
+                                    <field name="no_age" class="oe_inline"/>
+                                    <label for="no_age" string="כולל ללא גיל"/>
+                                </div>
+                                
+                                <label for="min_wage" string="שכר"/>
+                                <div class="o_row">
+                                    <field name="min_wage" class="oe_inline" placeholder="מינ"/>
+                                    <span> - </span>
+                                    <field name="max_wage" class="oe_inline" placeholder="מקס"/>
+                                    <field name="no_wage" class="oe_inline"/>
+                                    <label for="no_wage" string="כולל ללא שכר"/>
+                                </div>
+                            </group>
+                        </group>
+                        
+                        <group string="שפות נדרשות">
+                            <group>
+                                <field name="lang_hebrew" string="עברית"/>
+                                <field name="lang_english" string="אנגלית"/>
+                                <field name="lang_arabic" string="ערבית"/>
+                                <field name="lang_russian" string="רוסית"/>
+                            </group>
+                            <group>
+                                <field name="lang_spanish" string="ספרדית"/>
+                                <field name="lang_french" string="צרפתית"/>
+                                <field name="lang_amharic" string="אמהרית"/>
+                            </group>
+                        </group>
+                    </page>
+                    
+                    <!-- פרילנסרים -->
+                    <page string="פרילנסרים">
+                        <group>
+                            <group string="תגמול">
+                                <field name="freelancer_reward" string="תגמול לפרילנסר ₪"/>
+                            </group>
+                        </group>
+                    </page>
+                    
+                    <!-- הגדרות מערכת -->
+                    <page string="הגדרות מערכת">
+                        <group>
+                            <group string="הגדרות מועמדים">
+                                <field name="expire_days" string="תוקף (ימים)"/>
+                                <field name="norepeat_months" string="חזרה (חודשים)"/>
+                                <field name="full_cv" string="רק מועמדים עם קורות חיים"/>
+                                <field name="hebrew_cv" string="רק קורות חיים בעברית"/>
+                                <field name="crossreferral" string="הצלבת הפניות"/>
+                            </group>
+                            <group string="הגדרות אדמיניסטרטיביות">
+                                <field name="job_level" string="רמת סינון ראשוני"/>
+                                <field name="refer_channel" string="שיטת שליחה"/>
+                                <field name="referfail" string="שליחה מתיקון"/>
+                                <field name="sales_admin_id" string="רכז מטפל"/>
+                                <field name="oper_admin_id" string="רכז גיוס"/>
+                                <field name="more_admins_ids" widget="many2many_tags" string="רכזים נוספים"/>
+                                <field name="openings" string="תקנים פתוחים"/>
+                                <field name="is_urgent" string="משרה דחופה"/>
+                                <field name="hide_candidate_data" string="הסתר פרטי מועמד"/>
+                            </group>
+                        </group>
+                    </page>
+                    
+                </xpath>
+                
+            </field>
+        </record>
+        
+    </data>
+</odoo>

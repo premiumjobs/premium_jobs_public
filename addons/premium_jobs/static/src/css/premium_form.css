@@ -1,0 +1,42 @@
+/* Font - Apple system */
+
+.modal-dialog div
+{
+    display:block;
+}
+
+.partisi
+{
+    width: 100%;
+    border-radius: 20px;
+    position: relative;
+    margin-left:15px;
+    background:#fff !important;
+    padding:30px;
+}
+
+
+.o_form_renderer
+{
+    background:#eee !important;
+}
+
+
+.text-uppercase
+{
+    font-size:23px;
+}
+
+
+.partisi .field_wrapper
+{
+    background:#eee;
+    border-radius:8px;
+    padding:10px;
+    margin-bottom:10px;
+}
+
+.dropdown-item
+{
+    text-align:left !important;
+}

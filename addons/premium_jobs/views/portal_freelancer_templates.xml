@@ -1,0 +1,1094 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Add Security Link to Portal Sidebar -->
+    <template id="portal_sidebar_security_link" name="Portal Sidebar: Security Link" inherit_id="portal.side_content" priority="14">
+        <xpath expr="//a[@href='/my/account']" position="after">
+            <a role="button" href="/my/security" class="btn btn-link p-0 mt-2" style="display: block;text-align:right;">
+                התחברות &amp; אבטחה
+            </a>
+        </xpath>
+    </template>
+
+    <!-- Add Financial Stats to Portal Sidebar -->
+    <template id="portal_sidebar_financial_stats" name="Portal Sidebar: Financial Stats" inherit_id="portal.side_content" priority="15">
+        <xpath expr="//a[@href='/my/security']" position="after">
+            <t t-if="total_earned_all_time or total_pending">
+                <hr class="my-3"/>
+                <div class="card border-success">
+                    <div class="card-header bg-success text-white">
+                        <h6 class="mb-0"><i class="fa fa-money"/> סטטיסטיקה כספית</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-2">
+                            <strong>סה"כ הרווחים (כל הזמנים):</strong>
+                            <div class="text-success fs-5">
+                                ₪<t t-esc="'{:,.2f}'.format(total_earned_all_time or 0)"/>
+                            </div>
+                        </div>
+                        <hr/>
+                        <div class="mb-2">
+                            <strong>התקבל החודש:</strong>
+                            <div class="text-primary">
+                                ₪<t t-esc="'{:,.2f}'.format(monthly_earned or 0)"/>
+                            </div>
+                        </div>
+                        <div>
+                            <strong>ממתין לתשלום:</strong>
+                            <div class="text-warning">
+                                ₪<t t-esc="'{:,.2f}'.format(total_pending or 0)"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </template>
+
+    <!-- Add Avatar Upload to Portal My Details -->
+    <template id="portal_my_details_avatar" name="Portal My Details: Avatar Upload" inherit_id="portal.portal_my_details" priority="5">
+        <xpath expr="//form[@action='/my/account']" position="attributes">
+            <attribute name="enctype">multipart/form-data</attribute>
+        </xpath>
+    </template>
+    
+    <template id="portal_my_details_avatar_field" name="Portal My Details: Avatar Field" inherit_id="portal.portal_my_details_fields" priority="10">
+        <xpath expr="//input[@name='name']/.." position="before">
+            <div class="col-12 text-center mb-4">
+                <div class="position-relative d-inline-block">
+                    <img id="avatar_preview" class="rounded-circle o_object_fit_cover" t-att-src="image_data_uri(partner.avatar_128)" alt="Avatar" width="128" height="128"/>
+                    <label for="avatar_upload" class="position-absolute bottom-0 end-0 btn btn-sm btn-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px; cursor: pointer; padding: 0;">
+                        <i class="fa fa-camera" style="font-size: 16px;"/>
+                    </label>
+                </div>
+                <input type="file" class="d-none" id="avatar_upload" name="avatar_image" accept="image/png,image/jpeg,image/jpg" onchange="previewAvatar(this)"/>
+                <div class="mt-2">
+                    <small class="text-muted">לחץ על המצלמה להעלאת תמונה חדשה</small>
+                </div>
+            </div>
+            <script>
+                function previewAvatar(input) {
+                    if (input.files &amp;&amp; input.files[0]) {
+                        var reader = new FileReader();
+                        reader.onload = function(e) {
+                            document.getElementById('avatar_preview').src = e.target.result;
+                        }
+                        reader.readAsDataURL(input.files[0]);
+                    }
+                }
+            </script>
+        </xpath>
+    </template>
+
+    <!-- Add Jobs and Applications to Portal Home -->
+    <template id="portal_my_home_jobs" name="Portal My Home: Jobs" inherit_id="portal.portal_my_home" priority="30">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/premium_jobs/static/src/img/icon-jobs.svg'"/>
+                <t t-set="title">משרות זמינות</t>
+                <t t-set="text">עיין במשרות הפתוחות והגש מועמדות</t>
+                <t t-set="url" t-value="'/my/jobs'"/>
+                <t t-set="placeholder_count" t-value="'job_count'"/>
+            </t>
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="icon" t-value="'/premium_jobs/static/src/img/icon-applications.svg'"/>
+                <t t-set="title">המועמדויות שלי</t>
+                <t t-set="text">צפה ונהל את כל המועמדויות שהגשת</t>
+                <t t-set="url" t-value="'/my/applications'"/>
+                <t t-set="placeholder_count" t-value="'application_count'"/>
+            </t>
+        </xpath>
+    </template>
+    
+    <!-- Hide Security Card -->
+    <template id="portal_hide_security_card" name="Hide Security Card" inherit_id="portal.portal_my_home" priority="99">
+        <xpath expr="//t[@t-set='config_card']" position="attributes">
+            <attribute name="t-value">False</attribute>
+        </xpath>
+    </template>
+
+    <!-- Portal: Jobs List -->
+    <template id="portal_my_jobs" name="My Jobs">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">משרות זמינות</t>
+                <t t-set="searchbar_sortings" t-value="searchbar_sortings"/>
+                <t t-set="sortby" t-value="sortby"/>
+                <t t-set="search" t-value="search"/>
+                <t t-set="search_in" t-value="'content'"/>
+            </t>
+
+            <div class="container mt-4">
+                <!-- New Jobs Section (Cards) -->
+                <t t-if="new_jobs">
+                    <div class="mb-5">
+                        <h3 class="mb-4"><i class="fa fa-star text-warning"/> משרות חדשות</h3>
+                <div class="row">
+                            <t t-foreach="new_jobs" t-as="job">
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                    <div class="card h-100 shadow-sm border-warning">
+                                    <div class="card-body">
+                                        <h5 class="card-title">
+                                            <a t-attf-href="/my/jobs/#{job.id}" class="text-decoration-none">
+                                                <t t-esc="job.name"/>
+                                            </a>
+                                        </h5>
+                                            <p class="card-text text-muted small mb-2">
+                                                <i class="fa fa-building"/> <t t-set="company" t-value="job.tenant_id or job.company_id"/>
+                                                <t t-esc="company.name if company else ''"/>
+                                        </p>
+                                            <p class="card-text text-muted small mb-2">
+                                            <i class="fa fa-calendar"/> <t t-esc="job.create_date.strftime('%d/%m/%Y')"/>
+                                        </p>
+                                            <t t-set="location" t-value="job.city or (job.address_id.city if job.address_id else '')"/>
+                                            <t t-if="location">
+                                                <p class="card-text text-muted small mb-2">
+                                                    <i class="fa fa-map-marker"/> <t t-esc="location"/>
+                                                </p>
+                                            </t>
+                                            <p class="card-text text-muted small mb-2">
+                                                <i class="fa fa-users"/> <span class="badge bg-info"><t t-esc="job.no_of_recruitment or 1"/></span> משרות
+                                            </p>
+                                            <t t-if="job.freelancer_reward">
+                                                <p class="card-text text-success fw-bold mb-0">
+                                                    <i class="fa fa-money"/> תגמול: ₪<t t-esc="'{:,.0f}'.format(job.freelancer_reward)"/>
+                                                </p>
+                                            </t>
+                                        </div>
+                                        <div class="card-footer bg-transparent border-warning">
+                                            <a t-attf-href="/my/jobs/#{job.id}" class="btn btn-warning btn-sm w-100">
+                                                <i class="fa fa-eye"/> צפה במשרה
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                    <hr class="my-5"/>
+                </t>
+
+                <!-- All Jobs Section (Table with Filters) -->
+                <div class="mb-4">
+                    <h3 class="mb-4"><i class="fa fa-list"/> כל המשרות הזמינות</h3>
+                    
+                    <!-- Advanced Filters Card -->
+                    <div class="card shadow-sm mb-4" style="overflow: visible;">
+                        <div class="card-header bg-light">
+                            <h5 class="mb-0"><i class="fa fa-sliders"/> מסננים מתקדמים</h5>
+                        </div>
+                        <div class="card-body" style="overflow: visible;">
+                            <form method="get" action="/my/jobs" class="row g-3">
+                                <!-- Date From -->
+                                <div class="col-md-3">
+                                    <label class="form-label"><i class="fa fa-calendar"/> מתאריך</label>
+                                    <input type="date" name="date_from" class="form-control" t-att-value="date_from or ''"/>
+                                </div>
+                                
+                                <!-- Date To -->
+                                <div class="col-md-3">
+                                    <label class="form-label"><i class="fa fa-calendar"/> עד תאריך</label>
+                                    <input type="date" name="date_to" class="form-control" t-att-value="date_to or ''"/>
+                                </div>
+                                
+                                <!-- Company Filter -->
+                                <div class="col-md-3">
+                                    <label class="form-label"><i class="fa fa-building"/> חברה</label>
+                                    <div class="dropdown w-100" style="position: relative;">
+                                        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown">
+                                            <span id="jobs_company_label">
+                                                <t t-if="selected_company_ids">נבחרו <t t-esc="len(selected_company_ids)"/> חברות</t>
+                                                <t t-else="">כל החברות</t>
+                                            </span>
+                                        </button>
+                                        <div class="dropdown-menu p-3" style="min-width: 280px; max-height: 300px; position: absolute; z-index: 1050;" onclick="event.stopPropagation();">
+                                            <input type="text" class="form-control form-control-sm mb-2" placeholder="חפש..." onkeyup="filterJobsDropdown(this, 'jobs-company')"/>
+                                            <div style="max-height: 200px; overflow-y: auto;">
+                                                <t t-foreach="companies" t-as="company">
+                                                    <div class="form-check jobs-company-item">
+                                                        <input class="form-check-input jobs-company-checkbox" type="checkbox" 
+                                                               t-att-value="company['id']" 
+                                                               t-att-id="'jobs_company_' + str(company['id'])"
+                                                               t-att-checked="'checked' if company['id'] in selected_company_ids else None"
+                                                               onchange="updateJobsFilters()"/>
+                                                        <label class="form-check-label" t-att-for="'jobs_company_' + str(company['id'])">
+                                                            <t t-esc="company['name']"/>
+                                                        </label>
+                                                    </div>
+                                                </t>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="company_ids" id="jobs_company_ids_input" t-att-value="','.join(map(str, selected_company_ids)) if selected_company_ids else ''"/>
+                                </div>
+                                
+                                <!-- Job Filter -->
+                                <div class="col-md-3">
+                                    <label class="form-label"><i class="fa fa-briefcase"/> משרה</label>
+                                    <div class="dropdown w-100" style="position: relative;">
+                                        <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown">
+                                            <span id="jobs_job_label">
+                                                <t t-if="selected_job_ids">נבחרו <t t-esc="len(selected_job_ids)"/> משרות</t>
+                                                <t t-else="">כל המשרות</t>
+                                            </span>
+                                        </button>
+                                        <div class="dropdown-menu p-3" style="min-width: 280px; max-height: 300px; position: absolute; z-index: 1050;" onclick="event.stopPropagation();">
+                                            <input type="text" class="form-control form-control-sm mb-2" placeholder="חפש..." onkeyup="filterJobsDropdown(this, 'jobs-job')"/>
+                                            <div style="max-height: 200px; overflow-y: auto;">
+                                                <t t-foreach="jobs_list" t-as="job">
+                                                    <div class="form-check jobs-job-item">
+                                                        <input class="form-check-input jobs-job-checkbox" type="checkbox" 
+                                                               t-att-value="job['id']" 
+                                                               t-att-id="'jobs_job_' + str(job['id'])"
+                                                               t-att-checked="'checked' if job['id'] in selected_job_ids else None"
+                                                               onchange="updateJobsFilters()"/>
+                                                        <label class="form-check-label" t-att-for="'jobs_job_' + str(job['id'])">
+                                                            <t t-esc="job['name']"/>
+                                                        </label>
+                                                    </div>
+                                                </t>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="job_ids" id="jobs_job_ids_input" t-att-value="','.join(map(str, selected_job_ids)) if selected_job_ids else ''"/>
+                                </div>
+                                
+                                <!-- Preserve other parameters -->
+                                <input type="hidden" name="sortby" t-att-value="sortby"/>
+                                <input type="hidden" name="search" t-att-value="search or ''"/>
+                                
+                                <!-- Buttons -->
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fa fa-search"/> סנן
+                                    </button>
+                                    <a href="/my/jobs" class="btn btn-secondary">
+                                        <i class="fa fa-undo"/> נקה
+                                    </a>
+                                </div>
+                            </form>
+                            
+                            <script>
+                                function filterJobsDropdown(input, type) {
+                                    const filter = input.value.toUpperCase();
+                                    const items = document.getElementsByClassName(type + '-item');
+                                    for (let i = 0; i &lt; items.length; i++) {
+                                        const label = items[i].getElementsByTagName('label')[0];
+                                        const txtValue = label.textContent || label.innerText;
+                                        items[i].style.display = txtValue.toUpperCase().indexOf(filter) &gt; -1 ? '' : 'none';
+                                    }
+                                }
+                                
+                                function updateJobsFilters() {
+                                    const companyCheckboxes = document.querySelectorAll('.jobs-company-checkbox:checked');
+                                    const companyIds = Array.from(companyCheckboxes).map(cb =&gt; cb.value);
+                                    document.getElementById('jobs_company_ids_input').value = companyIds.join(',');
+                                    document.getElementById('jobs_company_label').textContent = companyIds.length &gt; 0 ? 'נבחרו ' + companyIds.length + ' חברות' : 'כל החברות';
+                                    
+                                    const jobCheckboxes = document.querySelectorAll('.jobs-job-checkbox:checked');
+                                    const jobIds = Array.from(jobCheckboxes).map(cb =&gt; cb.value);
+                                    document.getElementById('jobs_job_ids_input').value = jobIds.join(',');
+                                    document.getElementById('jobs_job_label').textContent = jobIds.length &gt; 0 ? 'נבחרו ' + jobIds.length + ' משרות' : 'כל המשרות';
+                                }
+                            </script>
+                        </div>
+                    </div>
+
+                    <t t-if="not jobs">
+                        <div class="alert alert-info text-center mt-4" role="alert">
+                            <i class="fa fa-inbox fa-3x mb-3 d-block text-muted"/>
+                            <h5>לא נמצאו משרות</h5>
+                            <p class="mb-3">נסה לשנות את הפילטרים או את מילות החיפוש</p>
+                        </div>
+                    </t>
+                    <t t-else="">
+                        <!-- Jobs Table Card -->
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-light">
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        <h5 class="mb-0"><i class="fa fa-list"/> רשימת משרות</h5>
+                                    </div>
+                                    <div class="col-auto">
+                                        <small class="text-muted me-3">סה"כ: <strong><t t-esc="job_count"/></strong> משרות</small>
+                                        <a t-attf-href="/my/jobs/export/csv?sortby=#{sortby}&amp;search=#{search or ''}&amp;date_from=#{date_from or ''}&amp;date_to=#{date_to or ''}&amp;company_ids=#{','.join(map(str, selected_company_ids)) if selected_company_ids else ''}&amp;job_ids=#{','.join(map(str, selected_job_ids)) if selected_job_ids else ''}" 
+                                           class="btn btn-sm btn-success me-2" title="ייצוא ל-CSV">
+                                            <i class="fa fa-file-text-o"/> CSV
+                                        </a>
+                                        <a t-attf-href="/my/jobs/export/excel?sortby=#{sortby}&amp;search=#{search or ''}&amp;date_from=#{date_from or ''}&amp;date_to=#{date_to or ''}&amp;company_ids=#{','.join(map(str, selected_company_ids)) if selected_company_ids else ''}&amp;job_ids=#{','.join(map(str, selected_job_ids)) if selected_job_ids else ''}" 
+                                           class="btn btn-sm btn-primary" title="ייצוא ל-Excel">
+                                            <i class="fa fa-file-excel-o"/> Excel
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover table-striped mb-0">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th><i class="fa fa-briefcase"/> שם המשרה</th>
+                                            <th><i class="fa fa-building"/> חברה</th>
+                                            <th><i class="fa fa-map-marker"/> מיקום</th>
+                                            <th><i class="fa fa-calendar"/> תאריך פרסום</th>
+                                            <th><i class="fa fa-users"/> מספר עובדים</th>
+                                            <th><i class="fa fa-money"/> תגמול</th>
+                                            <th class="text-center"><i class="fa fa-cog"/> פעולות</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="jobs" t-as="job">
+                                            <tr>
+                                                <td>
+                                                    <strong class="text-primary"><t t-esc="job.name"/></strong>
+                                                </td>
+                                                <td>
+                                                    <t t-set="company" t-value="job.tenant_id or job.company_id"/>
+                                                    <span class="badge bg-secondary"><t t-esc="company.name if company else ''"/></span>
+                                                </td>
+                                                <td>
+                                                    <t t-set="location" t-value="job.city or (job.address_id.city if job.address_id else '')"/>
+                                                    <t t-if="location">
+                                                        <i class="fa fa-map-marker text-muted"/> <t t-esc="location"/>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span class="text-muted">-</span>
+                                                    </t>
+                                                </td>
+                                                <td>
+                                                    <i class="fa fa-clock-o text-muted"/> <t t-esc="job.create_date.strftime('%d/%m/%Y')"/>
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-info"><t t-esc="job.no_of_recruitment or 1"/></span>
+                                                </td>
+                                                <td>
+                                                    <t t-if="job.freelancer_reward">
+                                                        <span class="text-success fw-bold">
+                                                            ₪<t t-esc="'{:,.0f}'.format(job.freelancer_reward)"/>
+                                                        </span>
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span class="text-muted">-</span>
+                                                    </t>
+                                                </td>
+                                                <td class="text-center">
+                                                    <a t-attf-href="/my/jobs/#{job.id}" class="btn btn-sm btn-primary">
+                                                        <i class="fa fa-eye"/> צפה
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                    </div>
+                    
+                    <!-- Pager -->
+                        <div class="row mt-4">
+                        <div class="col-12">
+                                <t t-call="portal.pager">
+                                    <t t-set="classname">justify-content-center</t>
+                                </t>
+                            </div>
+                        </div>
+                    </t>
+                    </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Portal: Job Detail with Application Form -->
+    <template id="portal_my_job_detail" name="Job Detail">
+        <t t-call="portal.portal_layout">
+            <div class="container mt-4">
+                <div class="row">
+                    <div class="col-12">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/my/jobs">משרות</a></li>
+                                <li class="breadcrumb-item active" aria-current="page"><t t-esc="job.name"/></li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- Success/Error Messages -->
+                <t t-if="request.params.get('success')">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>הצלחה!</strong> המועמדות שלך הוגשה בהצלחה.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"/>
+                    </div>
+                </t>
+                <t t-if="request.params.get('error') == 'already_applied'">
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <strong>שים לב!</strong> כבר הגשת מועמדות למשרה זו.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"/>
+                    </div>
+                </t>
+                <t t-if="request.params.get('error') == 'submission_failed'">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>שגיאה!</strong> אירעה שגיאה בהגשת המועמדות. נסה שוב.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"/>
+                    </div>
+                </t>
+
+                <!-- Job Details -->
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-body">
+                                <h2 class="card-title"><t t-esc="job.name"/></h2>
+                                <div class="mb-3">
+                                    <span class="badge bg-primary me-2">
+                                        <i class="fa fa-building"/> <t t-esc="job.company_id.name"/>
+                                    </span>
+                                    <t t-if="job.address_id">
+                                        <span class="badge bg-secondary">
+                                            <i class="fa fa-map-marker"/> <t t-esc="job.address_id.city or job.address_id.name"/>
+                                        </span>
+                                    </t>
+                                </div>
+                                
+                                <!-- Salary Range -->
+                                <div t-if="job.min_wage or job.max_wage" class="mt-3">
+                                    <strong>שכר:</strong>
+                                    <t t-if="job.min_wage">₪<t t-esc="'{:,.0f}'.format(job.min_wage)"/></t>
+                                    <t t-if="job.min_wage and job.max_wage"> - </t>
+                                    <t t-if="job.max_wage">₪<t t-esc="'{:,.0f}'.format(job.max_wage)"/></t>
+                                </div>
+                                
+                                <!-- Category -->
+                                <div t-if="job.main_category_id" class="mt-2">
+                                    <strong>קטגוריה:</strong> <t t-esc="job.main_category_id.name"/>
+                                </div>
+                                
+                                <!-- Age -->
+                                <div t-if="job.age_min or job.age_max" class="mt-2">
+                                    <strong>גיל:</strong>
+                                    <t t-if="job.age_min">מגיל <t t-esc="job.age_min"/></t>
+                                    <t t-if="job.age_min and job.age_max"> עד </t>
+                                    <t t-if="job.age_max">גיל <t t-esc="job.age_max"/></t>
+                                </div>
+                                
+                                <!-- Languages -->
+                                <div t-if="job.lang_hebrew != '0' or job.lang_english != '0' or job.lang_arabic != '0'" class="mt-2">
+                                    <strong>דרישות שפה:</strong>
+                                    <div class="mt-1">
+                                        <t t-if="job.lang_hebrew and job.lang_hebrew != '0'">
+                                            <span class="badge bg-secondary me-1">
+                                                עברית - <t t-esc="dict(job._fields['lang_hebrew'].selection).get(job.lang_hebrew)"/>
+                                            </span>
+                                        </t>
+                                        <t t-if="job.lang_english and job.lang_english != '0'">
+                                            <span class="badge bg-secondary me-1">
+                                                אנגלית - <t t-esc="dict(job._fields['lang_english'].selection).get(job.lang_english)"/>
+                                            </span>
+                                        </t>
+                                        <t t-if="job.lang_arabic and job.lang_arabic != '0'">
+                                            <span class="badge bg-secondary me-1">
+                                                ערבית - <t t-esc="dict(job._fields['lang_arabic'].selection).get(job.lang_arabic)"/>
+                                            </span>
+                                        </t>
+                                        <t t-if="job.lang_russian and job.lang_russian != '0'">
+                                            <span class="badge bg-secondary me-1">
+                                                רוסית - <t t-esc="dict(job._fields['lang_russian'].selection).get(job.lang_russian)"/>
+                                            </span>
+                                        </t>
+                                    </div>
+                                </div>
+                                
+                                <hr class="my-4"/>
+                                
+                                <div class="mt-4">
+                                    <h5>תיאור המשרה</h5>
+                                    <div t-if="job.internal_description" t-raw="job.internal_description"/>
+                                    <p t-else="" class="text-muted">אין תיאור זמין</p>
+                                </div>
+                                
+                                <t t-if="job.requirements_text">
+                                    <div class="mt-4">
+                                        <h5>דרישות המשרה</h5>
+                                        <div t-raw="job.requirements_text"/>
+                                    </div>
+                                </t>
+                                
+                                <t t-if="job.internal_notes and job.show_internal_notes">
+                                    <div class="mt-4 alert alert-warning">
+                                        <h6>הערות פנימיות</h6>
+                                        <div t-raw="job.internal_notes"/>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Application Form -->
+                    <div class="col-lg-4">
+                        <div class="card shadow-sm sticky-top" style="top: 20px;">
+                            <div class="card-body">
+                                <h5 class="card-title">הגש מועמדות</h5>
+                                
+                                <t t-if="existing_application">
+                                    <div class="alert alert-info" role="alert">
+                                        <i class="fa fa-check-circle"/> כבר הגשת מועמדות למשרה זו
+                                    </div>
+                                    <a href="/my/applications" class="btn btn-secondary w-100">
+                                        לצפייה במועמדויות שלי
+                                    </a>
+                                </t>
+                                <t t-else="">
+                                    <p class="text-muted small mb-3">הגש מועמד למשרה זו</p>
+                                    <form t-attf-action="/my/jobs/#{job.id}/apply" method="post" enctype="multipart/form-data">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        
+                                        <div class="mb-3">
+                                            <label for="candidate_name" class="form-label">שם המועמד *</label>
+                                            <input type="text" class="form-control" id="candidate_name" name="candidate_name" 
+                                                   placeholder="שם פרטי ומשפחה" required="1"/>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="candidate_email" class="form-label">אימייל המועמד *</label>
+                                            <input type="email" class="form-control" id="candidate_email" name="candidate_email" 
+                                                   placeholder="email@example.com" required="1"/>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="candidate_phone" class="form-label">טלפון המועמד *</label>
+                                            <input type="tel" class="form-control" id="candidate_phone" name="candidate_phone" 
+                                                   placeholder="05X-XXXXXXX" required="1"/>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="salary_expected" class="form-label">משכורת צפויה (ברוטו)</label>
+                                            <input type="number" class="form-control" id="salary_expected" name="salary_expected" 
+                                                   placeholder="₪10,000" min="0"/>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="degree" class="form-label">רמת השכלה</label>
+                                            <select class="form-control" id="degree" name="degree">
+                                                <option value="">בחר רמת השכלה</option>
+                                                <option value="1">תיכון</option>
+                                                <option value="2">תעודה</option>
+                                                <option value="3">תואר ראשון</option>
+                                                <option value="4">תואר שני</option>
+                                                <option value="5">תואר שלישי</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="linkedin_url" class="form-label">פרופיל LinkedIn</label>
+                                            <input type="url" class="form-control" id="linkedin_url" name="linkedin_url" 
+                                                   placeholder="https://www.linkedin.com/in/..."/>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="resume" class="form-label">קורות חיים (PDF/DOC) *</label>
+                                            <input type="file" class="form-control" id="resume" name="resume" 
+                                                   accept=".pdf,.doc,.docx" required="1"/>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="cover_letter" class="form-label">מכתב נלווה</label>
+                                            <textarea class="form-control" id="cover_letter" name="cover_letter" rows="4" 
+                                                      placeholder="ספר למה המועמד מתאים למשרה..."></textarea>
+                                        </div>
+                                        
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <i class="fa fa-paper-plane"/> הגש מועמדות
+                                        </button>
+                                    </form>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Portal: My Applications -->
+    <template id="portal_my_applications" name="My Applications">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">המועמדויות שלי</t>
+                <t t-set="searchbar_sortings" t-value="searchbar_sortings"/>
+                <t t-set="searchbar_filters" t-value="searchbar_filters"/>
+                <t t-set="sortby" t-value="sortby"/>
+                <t t-set="filterby" t-value="filterby"/>
+                <t t-set="search" t-value="search"/>
+                <t t-set="search_in" t-value="'content'"/>
+            </t>
+            
+            <div class="container mt-4">
+                <!-- Advanced Filters Card -->
+                <div class="card shadow-sm mb-4" style="overflow: visible;">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0"><i class="fa fa-sliders"/> מסננים מתקדמים</h5>
+                    </div>
+                    <div class="card-body" style="overflow: visible;">
+                        <form method="get" action="/my/applications" class="row g-3">
+                            <!-- Date From -->
+                            <div class="col-md-3">
+                                <label class="form-label"><i class="fa fa-calendar"/> מתאריך</label>
+                                <input type="date" name="date_from" class="form-control" t-att-value="date_from or ''"/>
+                            </div>
+                            
+                            <!-- Date To -->
+                            <div class="col-md-3">
+                                <label class="form-label"><i class="fa fa-calendar"/> עד תאריך</label>
+                                <input type="date" name="date_to" class="form-control" t-att-value="date_to or ''"/>
+                            </div>
+                            
+                            <!-- Company Filter -->
+                            <div class="col-md-3">
+                                <label class="form-label"><i class="fa fa-building"/> חברה</label>
+                                <div class="dropdown w-100" style="position: relative;">
+                                    <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown">
+                                        <span id="company_label">
+                                            <t t-if="selected_company_ids">נבחרו <t t-esc="len(selected_company_ids)"/> חברות</t>
+                                            <t t-else="">כל החברות</t>
+                                        </span>
+                                    </button>
+                                    <div class="dropdown-menu p-3" style="min-width: 280px; max-height: 300px; position: absolute; z-index: 1050;" onclick="event.stopPropagation();">
+                                        <input type="text" class="form-control form-control-sm mb-2" placeholder="חפש..." onkeyup="filterDropdown(this, 'company')"/>
+                                        <div style="max-height: 200px; overflow-y: auto;">
+                                            <t t-foreach="companies" t-as="company">
+                                                <div class="form-check company-item">
+                                                    <input class="form-check-input company-checkbox" type="checkbox" 
+                                                           t-att-value="company['id']" 
+                                                           t-att-id="'company_' + str(company['id'])"
+                                                           t-att-checked="'checked' if company['id'] in selected_company_ids else None"
+                                                           onchange="updateFilters()"/>
+                                                    <label class="form-check-label" t-att-for="'company_' + str(company['id'])">
+                                                        <t t-esc="company['name']"/>
+                                                    </label>
+                                                </div>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="company_ids" id="company_ids_input" t-att-value="','.join(map(str, selected_company_ids)) if selected_company_ids else ''"/>
+                            </div>
+                            
+                            <!-- Job Filter -->
+                            <div class="col-md-3">
+                                <label class="form-label"><i class="fa fa-briefcase"/> משרה</label>
+                                <div class="dropdown w-100" style="position: relative;">
+                                    <button class="btn btn-outline-secondary dropdown-toggle w-100 text-start" type="button" data-bs-toggle="dropdown">
+                                        <span id="job_label">
+                                            <t t-if="selected_job_ids">נבחרו <t t-esc="len(selected_job_ids)"/> משרות</t>
+                                            <t t-else="">כל המשרות</t>
+                                        </span>
+                                    </button>
+                                    <div class="dropdown-menu p-3" style="min-width: 280px; max-height: 300px; position: absolute; z-index: 1050;" onclick="event.stopPropagation();">
+                                        <input type="text" class="form-control form-control-sm mb-2" placeholder="חפש..." onkeyup="filterDropdown(this, 'job')"/>
+                                        <div style="max-height: 200px; overflow-y: auto;">
+                                            <t t-foreach="jobs" t-as="job">
+                                                <div class="form-check job-item">
+                                                    <input class="form-check-input job-checkbox" type="checkbox" 
+                                                           t-att-value="job['id']" 
+                                                           t-att-id="'job_' + str(job['id'])"
+                                                           t-att-checked="'checked' if job['id'] in selected_job_ids else None"
+                                                           onchange="updateFilters()"/>
+                                                    <label class="form-check-label" t-att-for="'job_' + str(job['id'])">
+                                                        <t t-esc="job['name']"/>
+                                                    </label>
+                                                </div>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="job_ids" id="job_ids_input" t-att-value="','.join(map(str, selected_job_ids)) if selected_job_ids else ''"/>
+                            </div>
+                            
+                            <!-- Preserve other parameters -->
+                            <input type="hidden" name="sortby" t-att-value="sortby"/>
+                            <input type="hidden" name="filterby" t-att-value="filterby"/>
+                            <input type="hidden" name="search" t-att-value="search or ''"/>
+                            
+                            <!-- Buttons -->
+                    <div class="col-12">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fa fa-search"/> סנן
+                                </button>
+                                <a href="/my/applications" class="btn btn-secondary">
+                                    <i class="fa fa-undo"/> נקה
+                                </a>
+                            </div>
+                        </form>
+                        
+                        <script>
+                            function filterDropdown(input, type) {
+                                const filter = input.value.toUpperCase();
+                                const items = document.getElementsByClassName(type + '-item');
+                                for (let i = 0; i &lt; items.length; i++) {
+                                    const label = items[i].getElementsByTagName('label')[0];
+                                    const txtValue = label.textContent || label.innerText;
+                                    items[i].style.display = txtValue.toUpperCase().indexOf(filter) &gt; -1 ? '' : 'none';
+                                }
+                            }
+                            
+                            function updateFilters() {
+                                const companyCheckboxes = document.querySelectorAll('.company-checkbox:checked');
+                                const companyIds = Array.from(companyCheckboxes).map(cb =&gt; cb.value);
+                                document.getElementById('company_ids_input').value = companyIds.join(',');
+                                document.getElementById('company_label').textContent = companyIds.length &gt; 0 ? 'נבחרו ' + companyIds.length + ' חברות' : 'כל החברות';
+                                
+                                const jobCheckboxes = document.querySelectorAll('.job-checkbox:checked');
+                                const jobIds = Array.from(jobCheckboxes).map(cb =&gt; cb.value);
+                                document.getElementById('job_ids_input').value = jobIds.join(',');
+                                document.getElementById('job_label').textContent = jobIds.length &gt; 0 ? 'נבחרו ' + jobIds.length + ' משרות' : 'כל המשרות';
+                            }
+                        </script>
+                    </div>
+                </div>
+
+                <t t-if="not applications">
+                    <div class="alert alert-info text-center mt-4" role="alert">
+                        <i class="fa fa-inbox fa-3x mb-3 d-block text-muted"/>
+                        <h5>לא נמצאו מועמדויות</h5>
+                        <p class="mb-3">נסה לשנות את הפילטרים או את מילות החיפוש</p>
+                        <a href="/my/jobs" class="btn btn-primary">
+                            <i class="fa fa-search"/> חפש משרות
+                        </a>
+                    </div>
+                </t>
+                <t t-else="">
+                    <!-- Applications Table Card -->
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-light">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h5 class="mb-0"><i class="fa fa-list"/> רשימת מועמדויות</h5>
+                                </div>
+                                <div class="col-auto">
+                                    <small class="text-muted me-3">סה"כ: <strong><t t-esc="len(applications)"/></strong> תוצאות</small>
+                                    <a t-attf-href="/my/applications/export/csv?filterby=#{filterby}&amp;sortby=#{sortby}&amp;search=#{search or ''}&amp;date_from=#{date_from or ''}&amp;date_to=#{date_to or ''}&amp;company_ids=#{','.join(map(str, selected_company_ids)) if selected_company_ids else ''}&amp;job_ids=#{','.join(map(str, selected_job_ids)) if selected_job_ids else ''}" 
+                                       class="btn btn-sm btn-success me-2" title="ייצוא ל-CSV">
+                                        <i class="fa fa-file-text-o"/> CSV
+                                    </a>
+                                    <a t-attf-href="/my/applications/export/excel?filterby=#{filterby}&amp;sortby=#{sortby}&amp;search=#{search or ''}&amp;date_from=#{date_from or ''}&amp;date_to=#{date_to or ''}&amp;company_ids=#{','.join(map(str, selected_company_ids)) if selected_company_ids else ''}&amp;job_ids=#{','.join(map(str, selected_job_ids)) if selected_job_ids else ''}" 
+                                       class="btn btn-sm btn-primary" title="ייצוא ל-Excel">
+                                        <i class="fa fa-file-excel-o"/> Excel
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th><i class="fa fa-briefcase"/> משרה</th>
+                                        <th><i class="fa fa-building"/> חברה</th>
+                                        <th><i class="fa fa-calendar"/> תאריך הגשה</th>
+                                        <th><i class="fa fa-flag"/> סטטוס</th>
+                                        <th><i class="fa fa-money"/> תגמול</th>
+                                        <th><i class="fa fa-check-circle"/> שולם/ממתין</th>
+                                        <th class="text-center"><i class="fa fa-comments"/> הודעות</th>
+                                        <th class="text-center"><i class="fa fa-cog"/> פעולות</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="applications" t-as="application">
+                                    <tr>
+                                        <td>
+                                                <strong class="text-primary"><t t-esc="application.job_id.name"/></strong>
+                                        </td>
+                                        <td>
+                                            <t t-if="application.job_id.tenant_id">
+                                                    <span class="badge bg-secondary"><t t-esc="application.job_id.tenant_id.name"/></span>
+                                            </t>
+                                            <t t-else="">
+                                                    <span class="badge bg-secondary"><t t-esc="application.job_id.company_id.name"/></span>
+                                            </t>
+                                        </td>
+                                            <td>
+                                                <i class="fa fa-clock-o text-muted"/> <t t-esc="application.create_date.strftime('%d/%m/%Y %H:%M')"/>
+                                            </td>
+                                        <td>
+                                                <span t-attf-class="badge #{application.stage_id.fold and 'bg-success' or 'bg-info'}">
+                                                <t t-esc="application.stage_id.name"/>
+                                            </span>
+                                        </td>
+                                        <td>
+                                                <t t-if="application.job_id.freelancer_reward">
+                                                    <span class="text-success fw-bold fs-6">
+                                                        ₪<t t-esc="'{:,.0f}'.format(application.job_id.freelancer_reward)"/>
+                                                    </span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span class="text-muted">-</span>
+                                                </t>
+                                            </td>
+                                            <td>
+                                                <t t-if="payment_status.get(application.id) == True">
+                                                    <span class="badge bg-success">
+                                                        <i class="fa fa-check"/> שולם
+                                                    </span>
+                                                </t>
+                                                <t t-elif="payment_status.get(application.id) == False">
+                                                    <span class="badge bg-warning text-dark">
+                                                        <i class="fa fa-clock-o"/> ממתין
+                                                    </span>
+                                                </t>
+                                                <t t-else="">
+                                                    <span class="text-muted">-</span>
+                                                </t>
+                                            </td>
+                                            <td class="text-center">
+                                            <span class="badge bg-primary">
+                                                    <i class="fa fa-comments"/> <t t-esc="message_counts.get(application.id, 0)"/>
+                                            </span>
+                                        </td>
+                                            <td class="text-center">
+                                            <a t-attf-href="/my/applications/{{ application.id }}" class="btn btn-sm btn-primary">
+                                                    <i class="fa fa-eye"/> צפה
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Pager -->
+                    <div class="row">
+                        <div class="col-12">
+                            <t t-call="portal.pager"/>
+                        </div>
+                    </div>
+                </t>
+            </div>
+        </t>
+    </template>
+
+    <!-- Application Detail with Messaging -->
+    <template id="portal_my_application_detail" name="Application Detail">
+        <t t-call="portal.portal_layout">
+            <t t-set="additional_title">מועמדות למשרה - {{ application.job_id.name }}</t>
+            
+            <div class="container mt-4 mb-5">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h3>
+                                <i class="fa fa-file-text-o"/> מועמדות למשרה: 
+                                <t t-esc="application.job_id.name"/>
+                            </h3>
+                            <a t-attf-href="/my/applications" class="btn btn-secondary">
+                                <i class="fa fa-arrow-right"/> חזרה לרשימה
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Success/Error Messages -->
+                <t t-if="request.params.get('success')">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fa fa-check-circle"/> ההודעה נשלחה בהצלחה!
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </t>
+                <t t-if="request.params.get('error') == 'empty_message'">
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <i class="fa fa-exclamation-triangle"/> נא להזין הודעה.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </t>
+                <t t-if="request.params.get('error') == 'message_failed'">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fa fa-times-circle"/> שגיאה בשליחת ההודעה. נסה שוב.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                </t>
+                
+                <div class="row">
+                    <!-- Application Info Column -->
+                    <div class="col-lg-4">
+                        <div class="card mb-4">
+                            <div class="card-header bg-primary text-white">
+                                <h5 class="mb-0"><i class="fa fa-info-circle"/> פרטי המועמדות</h5>
+                            </div>
+                            <div class="card-body">
+                                <dl class="row mb-0">
+                                    <dt class="col-sm-5">מועמד:</dt>
+                                    <dd class="col-sm-7"><t t-esc="application.partner_name"/></dd>
+                                    
+                                    <dt class="col-sm-5">אימייל:</dt>
+                                    <dd class="col-sm-7"><t t-esc="application.email_from"/></dd>
+                                    
+                                    <dt class="col-sm-5">טלפון:</dt>
+                                    <dd class="col-sm-7"><t t-esc="application.partner_phone"/></dd>
+                                    
+                                    <dt class="col-sm-5">חברה:</dt>
+                                    <dd class="col-sm-7">
+                                        <t t-if="application.job_id.tenant_id">
+                                            <t t-esc="application.job_id.tenant_id.name"/>
+                                        </t>
+                                        <t t-else="">
+                                            <t t-esc="application.job_id.company_id.name"/>
+                                        </t>
+                                    </dd>
+                                    
+                                    <dt class="col-sm-5">תאריך הגשה:</dt>
+                                    <dd class="col-sm-7">
+                                        <t t-esc="application.create_date" t-options="{'widget': 'date'}"/>
+                                    </dd>
+                                    
+                                    <dt class="col-sm-5">סטטוס:</dt>
+                                    <dd class="col-sm-7">
+                                        <span t-att-class="'badge bg-' + ('success' if application.stage_id.fold else 'info')">
+                                            <t t-esc="application.stage_id.name"/>
+                                        </span>
+                                    </dd>
+                                    
+                                    <dt class="col-sm-5">תגמול:</dt>
+                                    <dd class="col-sm-7">
+                                        <t t-if="application.job_id.freelancer_reward">
+                                            <span class="text-success fw-bold">
+                                                ₪<t t-esc="'{:,.0f}'.format(application.job_id.freelancer_reward)"/>
+                                            </span>
+                                        </t>
+                                        <t t-else="">
+                                            <span class="text-muted">לא צוין</span>
+                                        </t>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                        
+                        <!-- Attachments -->
+                        <t t-if="attachments">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0"><i class="fa fa-paperclip"/> קבצים מצורפים</h5>
+                                </div>
+                                <div class="card-body">
+                                    <t t-foreach="attachments" t-as="attachment">
+                                        <div class="mb-2">
+                                            <a t-attf-href="/web/content/{{ attachment.id }}?download=true" target="_blank">
+                                                <i class="fa fa-file-o"/> <t t-esc="attachment.name"/>
+                                            </a>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                    
+                    <!-- Messaging Column -->
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header bg-info text-white">
+                                <h5 class="mb-0"><i class="fa fa-comments"/> תקשורת עם Premium Jobs</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Message Form -->
+                                <form t-attf-action="/my/applications/{{ application.id }}/message" method="post" class="mb-4">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    
+                                    <div class="mb-3">
+                                        <label for="message" class="form-label">שלח הודעה חדשה:</label>
+                                        <textarea class="form-control" id="message" name="message" rows="4" 
+                                                  placeholder="הקלד את הודעתך כאן..." required="1"></textarea>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fa fa-paper-plane"/> שלח הודעה
+                                    </button>
+                                </form>
+                                
+                                <hr/>
+                                
+                                <!-- Messages List -->
+                                <div class="messages-container" style="max-height: 600px; overflow-y: auto;">
+                                    <t t-if="not messages">
+                                        <div class="alert alert-info text-center">
+                                            <i class="fa fa-info-circle"/> אין הודעות עדיין. התחל שיחה!
+                                        </div>
+                                    </t>
+                                    
+                                    <t t-foreach="messages" t-as="message">
+                                        <div class="card mb-3">
+                                            <div class="card-body">
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <strong>
+                                                        <i class="fa fa-user-circle"/> 
+                                                        <t t-esc="message.author_id.name"/>
+                                                    </strong>
+                                                    <small class="text-muted">
+                                                        <t t-esc="message.date" t-options="{'widget': 'datetime'}"/>
+                                                    </small>
+                                                </div>
+                                                <div t-raw="message.body"/>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <!-- Add Recent Messages from Contacts to Portal Home -->
+    <template id="portal_my_home_messages" name="Portal My Home: Contact Messages" inherit_id="portal.portal_my_home" priority="40">
+        <xpath expr="//div[@id='oe_structure_portal_my_home_2']" position="inside">
+            <t t-if="recent_messages">
+                <div class="container mt-5">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-info text-white">
+                            <h4 class="mb-0"><i class="fa fa-comments"/> צ'אט עם Premium Jobs</h4>
+                        </div>
+                        <div class="card-body">
+                            <!-- Reply Form -->
+                            <div class="mb-4">
+                                <form action="/my/contact/message" method="post">
+                                    <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                    
+                                    <div class="mb-3">
+                                        <label for="message" class="form-label"><strong>שלח הודעה:</strong></label>
+                                        <textarea class="form-control" id="message" name="message" rows="3" 
+                                                  placeholder="הקלד את הודעתך כאן..." required="1"></textarea>
+                                    </div>
+                                    
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fa fa-paper-plane"/> שלח הודעה
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            <hr/>
+                            
+                            <!-- Messages List -->
+                            <t t-foreach="recent_messages" t-as="msg">
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <strong>
+                                                <i class="fa fa-user-circle"/> 
+                                                <t t-esc="msg.author_id.name"/>
+                                            </strong>
+                                            <small class="text-muted">
+                                                <t t-esc="msg.date" t-options="{'widget': 'datetime', 'format': 'dd/MM/yyyy HH:mm'}"/>
+                                            </small>
+                                        </div>
+                                        <div t-raw="msg.body"/>
+                                    </div>
+                                </div>
+                            </t>
+                        </div>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+    </template>
+</odoo>
+

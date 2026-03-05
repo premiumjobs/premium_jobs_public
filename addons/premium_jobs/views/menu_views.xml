@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- Rename Contacts menu to לקוחות -->
+        <record model="ir.ui.menu" id="contacts.menu_contacts">
+            <field name="name">לקוחות</field>
+        </record>
+        
+        <!-- Main Menu -->
+        <menuitem id="menu_premium_jobs_root"
+                  name="סטטוס משרות"
+                  sequence="5"
+                  web_icon="premium_jobs,static/src/img/logo.png"/>
+        
+        <!-- Sub Menus -->
+        <menuitem id="menu_premium_jobs_jobs"
+                  name="Jobs"
+                  parent="menu_premium_jobs_root"
+                  sequence="10"/>
+        
+        <menuitem id="menu_premium_jobs_candidates"
+                  name="Candidates"
+                  parent="menu_premium_jobs_root"
+                  sequence="20"/>
+        
+        <menuitem id="menu_premium_jobs_freelancers"
+                  name="Freelancers"
+                  parent="menu_premium_jobs_root"
+                  sequence="30"/>
+        
+        <menuitem id="menu_premium_jobs_commissions"
+                  name="Commissions"
+                  parent="menu_premium_jobs_root"
+                  sequence="40"/>
+        
+        <menuitem id="menu_premium_jobs_clients"
+                  name="לקוחות"
+                  parent="menu_premium_jobs_root"
+                  sequence="50"/>
+        
+        <menuitem id="menu_premium_jobs_reports"
+                  name="Reports"
+                  parent="menu_premium_jobs_root"
+                  sequence="60"/>
+        
+    </data>
+</odoo>
+

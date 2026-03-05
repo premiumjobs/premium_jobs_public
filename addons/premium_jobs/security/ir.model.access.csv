@@ -1,0 +1,16 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_premium_commission_super_admin,premium.commission super admin,model_premium_commission,group_premium_super_admin,1,1,1,1
+access_premium_commission_coordinator,premium.commission coordinator,model_premium_commission,group_premium_coordinator,1,1,1,0
+access_premium_commission_client,premium.commission client,model_premium_commission,group_premium_client,1,0,0,0
+access_premium_commission_freelancer,premium.commission freelancer,model_premium_commission,group_premium_freelancer,1,0,0,0
+access_hr_job_category_all,hr.job.category all,model_hr_job_category,,1,1,1,0
+access_hr_job_tag_all,hr.job.tag all,model_hr_job_tag,,1,1,1,0
+access_hr_applicant_status_history_all,hr.applicant.status.history all,model_hr_applicant_status_history,,1,1,1,0
+access_hr_job_portal,hr.job portal,hr_recruitment.model_hr_job,base.group_portal,1,0,0,0
+access_hr_applicant_portal,hr.applicant portal,hr_recruitment.model_hr_applicant,base.group_portal,1,0,1,0
+access_hr_recruitment_stage_portal,hr.recruitment.stage portal,hr_recruitment.model_hr_recruitment_stage,base.group_portal,1,0,0,0
+access_hr_recruitment_degree_portal,hr.recruitment.degree portal,hr_recruitment.model_hr_recruitment_degree,base.group_portal,1,0,0,0
+access_freelancer_payment_manager,freelancer.payment manager,model_freelancer_payment,hr_recruitment.group_hr_recruitment_manager,1,1,1,1
+access_freelancer_payment_user,freelancer.payment user,model_freelancer_payment,hr_recruitment.group_hr_recruitment_user,1,1,1,0
+access_freelancer_payment_finance,freelancer.payment finance,model_freelancer_payment,group_premium_finance_manager,1,1,1,0
+

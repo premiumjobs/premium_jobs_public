@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- Tree View -->
+        <record id="view_freelancer_payment_tree" model="ir.ui.view">
+            <field name="name">freelancer.payment.tree</field>
+            <field name="model">freelancer.payment</field>
+            <field name="arch" type="xml">
+                <tree string="תשלומים לפרילנסרים" decoration-success="is_paid" decoration-warning="not is_paid">
+                    <field name="hire_date" string="תאריך גיוס"/>
+                    <field name="job_id" string="משרה"/>
+                    <field name="candidate_name" string="מועמד"/>
+                    <field name="company_name" string="חברה"/>
+                    <field name="freelancer_id" string="פרילנסר"/>
+                    <field name="amount" string="סכום תגמול ₪"/>
+                    <field name="is_paid" widget="boolean_toggle" string="שולם"/>
+                    <field name="payment_date" string="תאריך תשלום" optional="hide"/>
+                </tree>
+            </field>
+        </record>
+        
+        <!-- Form View -->
+        <record id="view_freelancer_payment_form" model="ir.ui.view">
+            <field name="name">freelancer.payment.form</field>
+            <field name="model">freelancer.payment</field>
+            <field name="arch" type="xml">
+                <form string="תשלום לפרילנסר">
+                    <header>
+                        <button name="action_mark_paid" string="סמן כשולם" type="object" 
+                                class="btn-primary" invisible="is_paid"/>
+                        <button name="action_mark_unpaid" string="סמן כלא שולם" type="object" 
+                                class="btn-warning" invisible="not is_paid"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="job_id" readonly="1"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group string="פרטי גיוס">
+                                <field name="applicant_id" readonly="1"/>
+                                <field name="candidate_name" readonly="1"/>
+                                <field name="company_name" readonly="1"/>
+                                <field name="hire_date"/>
+                            </group>
+                            <group string="פרטי תשלום">
+                                <field name="freelancer_id" readonly="1"/>
+                                <field name="amount" readonly="1"/>
+                                <field name="is_paid"/>
+                                <field name="payment_date"/>
+                            </group>
+                        </group>
+                        <group string="הערות">
+                            <field name="notes" nolabel="1"/>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        
+        <!-- Search View -->
+        <record id="view_freelancer_payment_search" model="ir.ui.view">
+            <field name="name">freelancer.payment.search</field>
+            <field name="model">freelancer.payment</field>
+            <field name="arch" type="xml">
+                <search string="חיפוש תשלומים">
+                    <field name="job_id" string="משרה"/>
+                    <field name="freelancer_id" string="פרילנסר"/>
+                    <field name="candidate_name" string="מועמד"/>
+                    <field name="company_name" string="חברה"/>
+                    
+                    <filter name="unpaid" string="ממתין לתשלום" 
+                            domain="[('is_paid', '=', False)]"/>
+                    <filter name="paid" string="שולם" 
+                            domain="[('is_paid', '=', True)]"/>
+                    
+                    <separator/>
+                    
+                    <filter name="this_month" string="חודש זה" 
+                            domain="[('hire_date', '>=', (context_today() - relativedelta(months=1)).strftime('%Y-%m-01'))]"/>
+                    <filter name="this_year" string="שנה זו" 
+                            domain="[('hire_date', '>=', (context_today().strftime('%Y-01-01')))]"/>
+                    
+                    <group expand="0" string="קיבוץ לפי">
+                        <filter name="group_freelancer" string="פרילנסר" 
+                                context="{'group_by': 'freelancer_id'}"/>
+                        <filter name="group_company" string="חברה" 
+                                context="{'group_by': 'company_name'}"/>
+                        <filter name="group_status" string="סטטוס תשלום" 
+                                context="{'group_by': 'is_paid'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        
+        <!-- Action -->
+        <record id="action_freelancer_payment" model="ir.actions.act_window">
+            <field name="name">תשלומים לפרילנסרים</field>
+            <field name="res_model">freelancer.payment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{
+                'search_default_unpaid': 1,
+            }</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    אין תשלומים ממתינים
+                </p>
+                <p>
+                    תשלומים נוצרים אוטומטית כאשר מועמד מתקבל לעבודה.
+                </p>
+            </field>
+        </record>
+        
+        <!-- Menu -->
+        <menuitem id="menu_freelancer_finances_root"
+                  name="כספים"
+                  groups="premium_jobs.group_premium_finance_manager"
+                  sequence="45"/>
+        
+        <menuitem id="menu_freelancer_payments"
+                  name="תשלומים לפרילנסרים"
+                  parent="menu_freelancer_finances_root"
+                  action="action_freelancer_payment"
+                  sequence="10"/>
+        
+    </data>
+</odoo>
+

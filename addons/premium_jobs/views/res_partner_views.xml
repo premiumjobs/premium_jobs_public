@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- Extend Partner Form View for Tenants and Freelancers -->
+        <record id="view_partner_form_inherit_premium" model="ir.ui.view">
+            <field name="name">res.partner.form.inherit.premium</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                
+                <!-- Hide company_type for sub-contacts -->
+                <field name="company_type" position="attributes">
+                    <attribute name="invisible">parent_id</attribute>
+                </field>
+                
+                <!-- Hide entire notebook (all tabs) for sub-contacts -->
+                <xpath expr="//notebook" position="attributes">
+                    <attribute name="invisible">parent_id</attribute>
+                </xpath>
+                
+                <!-- Add Premium Jobs fields after company_type -->
+                <field name="company_type" position="after">
+                    <!-- Need parent_id field for invisible condition -->
+                    <field name="parent_id" invisible="1"/>
+                    <!-- Hide checkboxes if this is a sub-contact (has parent_id) -->
+                    <div class="o_row" invisible="parent_id">
+                        <field name="is_tenant" class="oe_inline"/>
+                        <label for="is_tenant" string="לקוח"/>
+                    </div>
+                    <div class="o_row" invisible="parent_id">
+                        <field name="is_freelancer" class="oe_inline"/>
+                        <label for="is_freelancer" string="פרילנסר"/>
+                    </div>
+                </field>
+                
+                <!-- Add Premium Jobs tab for tenant information -->
+                <xpath expr="//notebook" position="inside">
+                    
+                    <!-- Tenant Information Tab -->
+                    <page string="מידע לקוח" invisible="is_tenant == False">
+                        <group>
+                            <group string="פרטי לקוח">
+                                <field name="subscription_status" string="סטטוס מנוי"/>
+                                <field name="subscription_start_date" string="תאריך התחלת מנוי"/>
+                                <field name="subscription_end_date" string="תאריך סיום מנוי"/>
+                                <field name="privacy_policy_url" string="קישור למדיניות פרטיות"/>
+                            </group>
+                            <group string="לוגו">
+                                <field name="tenant_logo" string="לוגו לקוח" widget="image" class="oe_avatar"/>
+                                <field name="tenant_logo_filename" invisible="1"/>
+                            </group>
+                        </group>
+                    </page>
+                    
+                    <!-- Freelancer Information Tab -->
+                    <page string="מידע פרילנסר" invisible="is_freelancer == False">
+                        <group>
+                            <group string="פרטי פרילנסר">
+                                <field name="premium_user_type" string="סוג משתמש"/>
+                                <field name="experience_level" string="רמת ניסיון"/>
+                                <field name="specialization" string="התמחות"/>
+                                <field name="freelancer_rating" string="דירוג"/>
+                                <field name="successful_projects_count" string="פרויקטים מוצלחים"/>
+                            </group>
+                            <group string="פרטים כלכליים">
+                                <field name="currency_id" invisible="1"/>
+                                <field name="hourly_rate" string="תעריף לשעה"/>
+                                <field name="portfolio_url" string="קישור לתיק עבודות"/>
+                                <field name="linkedin_url" string="פרופיל LinkedIn"/>
+                                <field name="freelancer_timezone" string="אזור זמן"/>
+                            </group>
+                        </group>
+                        <group string="כישורים">
+                            <field name="freelancer_skills" string="כישורים" widget="many2many_tags"/>
+                        </group>
+                    </page>
+                    
+                    <!-- Premium Jobs User Type -->
+                    <page string="הגדרות Premium Jobs" groups="premium_jobs.group_premium_super_admin">
+                        <group>
+                            <group>
+                                <field name="premium_user_type" string="סוג משתמש במערכת"/>
+                                <field name="employee_position" string="תפקיד"/>
+                                <field name="employee_department" string="מחלקה"/>
+                            </group>
+                        </group>
+                    </page>
+                    
+                </xpath>
+                
+            </field>
+        </record>
+        
+        <!-- Extend Partner Search View to add filters -->
+        <record id="view_partner_search_inherit_premium" model="ir.ui.view">
+            <field name="name">res.partner.search.inherit.premium</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_res_partner_filter"/>
+            <field name="arch" type="xml">
+                
+                <!-- Add filters after existing filters -->
+                <xpath expr="//filter[@name='inactive']" position="after">
+                    <separator/>
+                    <filter string="לקוחות" name="filter_tenants" 
+                            domain="[('is_tenant', '=', True)]"/>
+                    <filter string="פרילנסרים" name="filter_freelancers" 
+                            domain="[('is_freelancer', '=', True)]"/>
+                    <filter string="עובדי Premium Jobs" name="filter_internal_employees" 
+                            domain="[('user_ids', '!=', False), ('user_ids.share', '=', False)]"
+                            help="הצג רק עובדים פנימיים של Premium Jobs"/>
+                </xpath>
+                
+            </field>
+        </record>
+        
+    </data>
+</odoo>
+

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- Прямой шаблон главной страницы БЕЗ наследования -->
+<template id="homepage_direct" name="Premium Jobs Homepage Direct">
+    <t t-call="website.layout">
+        <div id="wrap" class="premium_homepage" dir="rtl">
+            
+            <!-- Hero Section with Search -->
+            <section class="hero_search_section">
+                <div class="container text-center">
+                    <h1 class="hero_title">מצא את העבודה המושלמת</h1>
+                    <h1 style="color: red;">TEST</h1>
+                    <p class="hero_subtitle">אלפי משרות מובילות ממתינות לך</p>
+                    
+                    <div class="search_box">
+                        <form action="/jobs" method="get" class="job_search_form">
+                            <div class="search_input_wrapper">
+                                <i class="fa fa-search search_icon"/>
+                                <input type="text" name="search" class="search_input" placeholder="חפש משרה לפי מילות מפתח, תפקיד, חברה..."/>
+                                <button type="submit" class="search_btn">חפש</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Latest Jobs Section -->
+            <section class="latest_jobs_section">
+                <div class="container">
+                    <h2 class="section_title">משרות חדשות</h2>
+                    
+                    <div class="row">
+                        <t t-foreach="latest_jobs" t-as="job">
+                            <div class="col-md-4 mb-4">
+                                <div class="job_card">
+                                    <a t-attf-href="/jobs/#{slug(job)}" class="job_card_link">
+                                        <h3 class="job_title" t-field="job.name"/>
+                                        
+                                        <div class="job_meta">
+                                            <span class="job_company" t-if="job.tenant_id">
+                                                <i class="fa fa-building"/> <t t-esc="job.tenant_id.name"/>
+                                            </span>
+                                            <span class="job_location" t-if="job.address_id">
+                                                <i class="fa fa-map-marker"/> <t t-esc="job.address_id.city"/>
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="job_salary" t-if="job.min_wage or job.max_wage">
+                                            <i class="fa fa-money"/>
+                                            <t t-if="job.min_wage">₪<t t-esc="'{:,.0f}'.format(job.min_wage)"/></t>
+                                            <t t-if="job.min_wage and job.max_wage"> - </t>
+                                            <t t-if="job.max_wage">₪<t t-esc="'{:,.0f}'.format(job.max_wage)"/></t>
+                                        </div>
+                                        
+                                        <div class="job_category" t-if="job.main_category_id">
+                                            <span class="category_badge" t-field="job.main_category_id"/>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </t>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <a href="/jobs" class="btn btn-primary btn-lg">כל המשרות</a>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Job Categories Tabs -->
+            <section class="job_categories_section">
+                <div class="container">
+                    <h2 class="section_title">חפש לפי קטגוריה</h2>
+                    
+                    <div class="categories_tabs">
+                        <a href="/jobs" class="category_tab category_tab_all">
+                            <i class="fa fa-th"/>
+                            כל הקטגוריות
+                        </a>
+                        <t t-foreach="categories" t-as="category">
+                            <a t-attf-href="/jobs?category_id=#{category.id}" class="category_tab">
+                                <span t-field="category.name"/>
+                            </a>
+                        </t>
+                    </div>
+                </div>
+            </section>
+            
+            <div class="oe_structure mt-5"/>
+            
+        </div>
+    </t>
+</template>
+
+</odoo>
+

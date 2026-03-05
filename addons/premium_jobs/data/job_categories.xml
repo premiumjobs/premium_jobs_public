@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        
+        <record id="job_category_1001" model="hr.job.category">
+            <field name="name">אדמיניסטרציה</field>
+        </record>
+        
+        <record id="job_category_1004" model="hr.job.category">
+            <field name="name">הייטק ומחשבים</field>
+        </record>
+        
+        <record id="job_category_1016" model="hr.job.category">
+            <field name="name">חשמלאים ואחזקה</field>
+        </record>
+        
+        <record id="job_category_1010" model="hr.job.category">
+            <field name="name">יבוא ורכש</field>
+        </record>
+        
+        <record id="job_category_1002" model="hr.job.category">
+            <field name="name">כספים</field>
+        </record>
+        
+        <record id="job_category_1012" model="hr.job.category">
+            <field name="name">מהנדסים ופארמה</field>
+        </record>
+        
+        <record id="job_category_1006" model="hr.job.category">
+            <field name="name">מחסנאות ולוגיסטיקה</field>
+        </record>
+        
+        <record id="job_category_1007" model="hr.job.category">
+            <field name="name">מכירות ושיווק</field>
+        </record>
+        
+        <record id="job_category_1008" model="hr.job.category">
+            <field name="name">מנהלים</field>
+        </record>
+        
+        <record id="job_category_1000" model="hr.job.category">
+            <field name="name">מפעילי מכונה ועובדי ייצור</field>
+        </record>
+        
+        <record id="job_category_1015" model="hr.job.category">
+            <field name="name">משרה חלקית/אם/סטודנט</field>
+        </record>
+        
+        <record id="job_category_1014" model="hr.job.category">
+            <field name="name">משרות דחופות</field>
+        </record>
+        
+        <record id="job_category_1011" model="hr.job.category">
+            <field name="name">מתקינים וטכנאים</field>
+        </record>
+        
+        <record id="job_category_1005" model="hr.job.category">
+            <field name="name">נהגים ותחום הרכב</field>
+        </record>
+        
+        <record id="job_category_1009" model="hr.job.category">
+            <field name="name">סופר וכללי</field>
+        </record>
+        
+        <record id="job_category_1013" model="hr.job.category">
+            <field name="name">עורכי דין</field>
+        </record>
+        
+        <record id="job_category_9999" model="hr.job.category">
+            <field name="name">קוד לפרסום בלבד</field>
+        </record>
+        
+        <record id="job_category_1003" model="hr.job.category">
+            <field name="name">שרות לקוחות</field>
+        </record>
+        
+    </data>
+</odoo>
+

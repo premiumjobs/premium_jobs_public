@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- Add Assistant font to website -->
+<template id="assistant_font_head" inherit_id="website.layout" name="Assistant Font - Website">
+    <xpath expr="//head" position="inside">
+        <link rel="preconnect" href="https://fonts.googleapis.com"/>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+        <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@200..800&amp;display=swap" rel="stylesheet"/>
+    </xpath>
+</template>
+
+<!-- Premium Job Detail Page - Add fields after job name -->
+<template id="job_detail_premium" inherit_id="website_hr_recruitment.detail" name="Premium Jobs - Job Detail Hebrew" priority="15">
+    
+    <!-- Hide default address display -->
+    <xpath expr="//h5[@t-field='job.address_id']" position="replace"/>
+    
+    <!-- Premium Job Card - Scoped Styles -->
+    <xpath expr="//section[hasclass('pb32')]//h1" position="after">
+        
+        <style>
+            #premiumJobCard {
+                background: linear-gradient(145deg, #ffffff 0%, #f9fafb 100%);
+                border-radius: 20px;
+                padding: 0;
+                margin: 32px 0;
+                box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+                overflow: hidden;
+                font-family: -apple-system, BlinkMacSystemFont, 'Assistant', 'Segoe UI', Roboto, sans-serif;
+            }
+            
+            #premiumJobCard .job-info-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+                padding: 28px;
+            }
+            
+            #premiumJobCard .job-info-item {
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                padding: 18px 20px;
+                background: #ffffff;
+                border-radius: 12px;
+                border: 1px solid rgba(0, 0, 0, 0.06);
+            }
+            
+            #premiumJobCard .job-icon-wrapper {
+                width: 62px;
+                height: 62px;
+                min-width: 62px;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background:#F7F4F4;
+            }
+            
+            #premiumJobCard .job-icon-wrapper i {
+                color: #000;
+                font-size: 18px;
+            }
+            
+            #premiumJobCard .job-info-content {
+                flex: 1;
+                min-width: 0;
+                text-align: right;
+            }
+            
+            #premiumJobCard .job-info-label {
+                font-size: 11px;
+                font-weight: 600;
+                color: #9ca3af;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 5px;
+            }
+            
+            #premiumJobCard .job-info-value {
+                font-size: 18px;
+                font-weight: 500;
+                color: #1f2937;
+                line-height: 1.3;
+            }
+            
+            #premiumJobCard .company-logo {
+                width: 62px;
+                height: 62px;
+                min-width: 62px;
+                border-radius: 10px;
+                object-fit: contain;
+                background: #f9fafb;
+                padding: 4px;
+            }
+            
+            #premiumJobCard .job-languages-wrapper {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-top: 8px;
+            }
+            
+            #premiumJobCard .job-lang-badge {
+                display: inline-flex;
+                padding: 6px 14px;
+                background:#fff;
+                border:1px #ddd solid;
+                color: #000;
+                border-radius: 20px;
+                font-size: 12px;
+                font-weight: 600;
+                white-space: nowrap;
+            }
+            
+            #premiumJobCard .job-info-languages {
+                grid-column: 1 / -1;
+            }
+            
+            #premiumJobCard .job-description-section {
+                padding: 28px;
+                background: #ffffff;
+                border-top: 1px solid rgba(0, 0, 0, 0.06);
+            }
+            
+            #premiumJobCard .job-description-section h3 {
+                font-size: 20px;
+                font-weight: 700;
+                color: #1f2937;
+                margin-bottom: 16px;
+            }
+            
+            #premiumJobCard .job-description-section .job-description-content {
+                font-size: 18px;
+                line-height: 1.7;
+                color: #4b5563;
+            }
+            
+            @media (max-width: 768px) {
+                #premiumJobCard .job-info-grid {
+                    grid-template-columns: 1fr;
+                    padding: 20px;
+                    gap: 12px;
+                }
+                
+                #premiumJobCard .job-info-item {
+                    padding: 16px;
+                }
+                
+                #premiumJobCard .job-description-section {
+                    padding: 20px;
+                }
+            }
+        </style>
+        
+        <div id="premiumJobCard" dir="rtl">
+            
+            <!-- Job Information Grid -->
+            <div class="job-info-grid">
+                
+                <!-- Company -->
+                <div t-if="job.tenant_id" class="job-info-item">
+                    <t t-if="job.tenant_id.image_1920">
+                        <img class="company-logo" t-att-src="image_data_uri(job.tenant_id.image_1920)" t-att-alt="job.tenant_id.name"/>
+                    </t>
+                    <t t-else="">
+                        <div class="job-icon-wrapper">
+                            <i class="fa fa-building"/>
+                        </div>
+                    </t>
+                    <div class="job-info-content">
+                        <div class="job-info-label">חברה</div>
+                        <div class="job-info-value" t-field="job.tenant_id.name"/>
+                    </div>
+                </div>
+                
+                <!-- Location -->
+                <div t-if="job.address_id" class="job-info-item">
+                    <div class="job-icon-wrapper">
+                        <i class="fa fa-map-marker"/>
+                    </div>
+                    <div class="job-info-content">
+                        <div class="job-info-label">מיקום</div>
+                        <div class="job-info-value">
+                            <t t-if="job.address_id.street"><span t-field="job.address_id.street"/>, </t>
+                            <t t-if="job.address_id.city"><span t-field="job.address_id.city"/></t>
+                            <t t-if="job.address_id.zip">, <span t-field="job.address_id.zip"/></t>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Employment Type -->
+                <div t-if="job.contract_type_id" class="job-info-item">
+                    <div class="job-icon-wrapper">
+                        <i class="fa fa-briefcase"/>
+                    </div>
+                    <div class="job-info-content">
+                        <div class="job-info-label">סוג משרה</div>
+                        <div class="job-info-value" t-field="job.contract_type_id"/>
+                    </div>
+                </div>
+                
+                <!-- Salary Range -->
+                <div t-if="job.min_wage or job.max_wage" class="job-info-item">
+                    <div class="job-icon-wrapper">
+                        <i class="fa fa-money"/>
+                    </div>
+                    <div class="job-info-content">
+                        <div class="job-info-label">שכר</div>
+                        <div class="job-info-value">
+                            <t t-if="job.min_wage">₪<span t-field="job.min_wage"/></t>
+                            <t t-if="job.min_wage and job.max_wage"> - </t>
+                            <t t-if="job.max_wage">₪<span t-field="job.max_wage"/></t>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Department -->
+                <div t-if="job.department_id" class="job-info-item">
+                    <div class="job-icon-wrapper">
+                        <i class="fa fa-users"/>
+                    </div>
+                    <div class="job-info-content">
+                        <div class="job-info-label">מחלקה</div>
+                        <div class="job-info-value" t-field="job.department_id"/>
+                    </div>
+                </div>
+                
+                <!-- Categories -->
+                <div t-if="job.main_category_id" class="job-info-item">
+                    <div class="job-icon-wrapper">
+                        <i class="fa fa-tags"/>
+                    </div>
+                    <div class="job-info-content">
+                        <div class="job-info-label">קטגוריה</div>
+                        <div class="job-info-value" t-field="job.main_category_id"/>
+                    </div>
+                </div>
+                
+                <!-- Age -->
+                <div t-if="job.age_min or job.age_max" class="job-info-item">
+                    <div class="job-icon-wrapper">
+                        <i class="fa fa-calendar"/>
+                    </div>
+                    <div class="job-info-content">
+                        <div class="job-info-label">גיל</div>
+                        <div class="job-info-value">
+                            <t t-if="job.age_min">מגיל <span t-field="job.age_min"/></t>
+                            <t t-if="job.age_min and job.age_max"> עד </t>
+                            <t t-if="job.age_max">גיל <span t-field="job.age_max"/></t>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Language Requirements -->
+                <div t-if="job.lang_hebrew != '0' or job.lang_english != '0' or job.lang_arabic != '0' or job.lang_russian != '0' or job.lang_spanish != '0' or job.lang_french != '0' or job.lang_amharic != '0'" class="job-info-item job-info-languages">
+                    <div class="job-icon-wrapper">
+                        <i class="fa fa-language"/>
+                    </div>
+                    <div class="job-info-content">
+                        <div class="job-info-label">דרישות שפה</div>
+                        <div class="job-languages-wrapper">
+                            <span t-if="job.lang_hebrew and job.lang_hebrew != '0'" class="job-lang-badge">
+                                עברית - <t t-esc="dict(job._fields['lang_hebrew'].selection).get(job.lang_hebrew)"/>
+                            </span>
+                            <span t-if="job.lang_english and job.lang_english != '0'" class="job-lang-badge">
+                                אנגלית - <t t-esc="dict(job._fields['lang_english'].selection).get(job.lang_english)"/>
+                            </span>
+                            <span t-if="job.lang_arabic and job.lang_arabic != '0'" class="job-lang-badge">
+                                ערבית - <t t-esc="dict(job._fields['lang_arabic'].selection).get(job.lang_arabic)"/>
+                            </span>
+                            <span t-if="job.lang_russian and job.lang_russian != '0'" class="job-lang-badge">
+                                רוסית - <t t-esc="dict(job._fields['lang_russian'].selection).get(job.lang_russian)"/>
+                            </span>
+                            <span t-if="job.lang_spanish and job.lang_spanish != '0'" class="job-lang-badge">
+                                ספרדית - <t t-esc="dict(job._fields['lang_spanish'].selection).get(job.lang_spanish)"/>
+                            </span>
+                            <span t-if="job.lang_french and job.lang_french != '0'" class="job-lang-badge">
+                                צרפתית - <t t-esc="dict(job._fields['lang_french'].selection).get(job.lang_french)"/>
+                            </span>
+                            <span t-if="job.lang_amharic and job.lang_amharic != '0'" class="job-lang-badge">
+                                אמהרית - <t t-esc="dict(job._fields['lang_amharic'].selection).get(job.lang_amharic)"/>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <!-- Job Description Section -->
+            <div t-if="job.internal_description" class="job-description-section">
+                <h3>תיאור משרה</h3>
+                <div class="job-description-content" t-field="job.internal_description"/>
+            </div>
+            
+        </div>
+    </xpath>
+    
+</template>
+
+</odoo>

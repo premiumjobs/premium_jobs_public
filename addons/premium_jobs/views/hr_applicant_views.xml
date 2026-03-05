@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        
+        <!-- Action для создания заявок -->
+        <record id="hr_applicant_action_premium" model="ir.actions.act_window">
+            <field name="name">מועמדים</field>
+            <field name="res_model">hr.applicant</field>
+            <field name="view_mode">kanban,tree,form,calendar,pivot,graph,activity</field>
+            <field name="context">{}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    צור מועמד חדש
+                </p>
+                <p>
+                    כאן תוכל לנהל את כל המועמדים למשרות שלך.
+                </p>
+            </field>
+        </record>
+        
+        <!-- Меню для заявок -->
+        <menuitem id="menu_premium_jobs_applicants"
+                  name="מועמדים"
+                  parent="menu_premium_jobs_root"
+                  action="hr_applicant_action_premium"
+                  sequence="15"/>
+        
+        <!-- Наследование формы заявки для добавления custom полей -->
+        <record id="hr_applicant_form_inherit_premium" model="ir.ui.view">
+            <field name="name">hr.applicant.form.inherit.premium</field>
+            <field name="model">hr.applicant</field>
+            <field name="inherit_id" ref="hr_recruitment.hr_applicant_view_form"/>
+            <field name="arch" type="xml">
+                
+                <!-- Добавляем поле tenant_id после job_id -->
+                <field name="job_id" position="after">
+                    <field name="tenant_id" string="לקוח" readonly="1"/>
+                </field>
+                
+                <!-- Добавляем custom поля в notebook -->
+                <xpath expr="//notebook" position="inside">
+                    
+                    <page string="פרטים נוספים">
+                        <group>
+                            <group string="מידע נוסף">
+                                <field name="city" string="עיר מגורים"/>
+                                <field name="source_type" string="סוג מקור"/>
+                                <field name="submitted_by_freelancer_id" string="הוגש ע״י פרילנסר"/>
+                                <field name="applied_date" string="תאריך הגשה"/>
+                            </group>
+                            <group string="עמלה">
+                                <field name="has_commission" string="יש עמלה"/>
+                                <field name="commission_id" string="רשומת עמלה" invisible="has_commission == False"/>
+                            </group>
+                        </group>
+                        
+                        <group string="תשובות ושאלונים">
+                            <field name="application_answers" string="תשובות בקשה" widget="text"/>
+                            <field name="screening_answers" string="תשובות סינון" widget="text"/>
+                        </group>
+                        
+                        <group string="סיבת דחייה" invisible="refuse_reason_id == False">
+                            <field name="rejection_reason" string="סיבת דחייה מפורטת" widget="text"/>
+                        </group>
+                    </page>
+                    
+                </xpath>
+                
+            </field>
+        </record>
+        
+    </data>
+</odoo>
+

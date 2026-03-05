@@ -1,0 +1,27 @@
+[options]
+addons_path = /path/to/odoo_source/addons,/path/to/project/addons
+admin_passwd = CHANGE_ME
+
+data_dir = /path/to/project/data_dir
+db_host = localhost
+db_port = 5432
+db_user = odoo_user
+db_password = CHANGE_ME
+db_name = odoo_db
+
+http_port = 8069
+workers = 2
+max_cron_threads = 1
+limit_memory_hard = 1677721600
+limit_memory_soft = 1342177280
+limit_request = 16777216
+limit_time_cpu = 600
+limit_time_real = 1200
+
+log_level = info
+logfile = /path/to/project/logs/odoo.log
+proxy_mode = True
+xmlrpc_port = 8069
+gevent_port = 8072
+web.base.url = https://example.com
+email_from = admin@example.com

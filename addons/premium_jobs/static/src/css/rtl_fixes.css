@@ -1,0 +1,22 @@
+/* RTL Fixes - Глобальные исправления для RTL */
+
+.dropdown-item
+{
+    text-align:left !important;
+}
+
+
+.modal-body .oe_menu_editor span.form-control
+{
+    width:200px;
+}
+
+.o_jobs_image_gallery .s_nb_column_fixed div
+{
+	margin-top:26px !important;
+}
+
+/* Скрыть красную полоску с ошибкой JS модулей */
+#checkAndReportErrorsNotification {
+    display: none !important;
+}

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+    ═══════════════════════════════════════════════════════════════════════════════
+    PREMIUM JOBS - INTERFACE VISIBILITY CONFIGURATION
+    ═══════════════════════════════════════════════════════════════════════════════
+    
+    Этот файл управляет видимостью элементов интерфейса CRM для всех пользователей.
+    
+    ВАЖНО:
+    - После изменений нужно обновить модуль: make update
+    - Элементы скрываются для ВСЕХ пользователей (включая админов)
+    - Чтобы показать элемент обратно - закомментируй соответствующий блок
+    
+    ЭЛЕМЕНТЫ, СКРЫТЫЕ ЧЕРЕЗ ЭТОТ ФАЙЛ:
+    
+    МЕНЮ ПОЛЬЗОВАТЕЛЯ (через JS):
+    - "חשבון ה-Odoo שלי" (My Odoo.com account)
+    - "תיעוד" (Documentation)
+    - "תמיכה" (Support)
+    - "קיצורי דרך" (Shortcuts)
+    
+    ГЛАВНОЕ МЕНЮ (через XML):
+    - "ישומים" (Apps)
+    - "מעקב קישורים" (Link Tracker)
+    - "ניהול קשרי לקוחות" (CRM)
+    
+    СЕКЦИИ В НАСТРОЙКАХ (через XML):
+    - "אנשי קשר" (Contacts - SMS, Odoo IAP)
+    - "עסקאות בין-חברתיות" (Inter-Company Transactions)
+    - "Progressive Web App" (PWA settings)
+    - "Performance" (Profiling tools)
+    - "שאילתות רוחביות" (Searchable Settings / Developer Tools)
+    - "אודות" (About - App Store links, Odoo version)
+    
+    КНОПКИ В DROPDOWN МЕНЮ ФОРМЫ КОНТАКТА (через JS):
+    - "שליחת הודעת SMS" (Send SMS)
+    - "הודרה (vCard)" (Download vCard)
+    - "Privacy Lookup"
+    - "אפשר גישה לפורטל" (Grant Portal Access)
+    
+    КНОПКИ В ФОРМЕ КОНТАКТА (через JS):
+    - "התחל תוכנית" (Start Program)
+    
+    ═══════════════════════════════════════════════════════════════════════════════
+    -->
+    
+    <data noupdate="0">
+        
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             СКРЫТЫЕ ПУНКТЫ МЕНЮ
+             ═══════════════════════════════════════════════════════════════════════ -->
+        
+        <!-- Скрыть меню "ישומים" (Apps) -->
+        <record id="base.menu_management" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>
+        
+        <!-- ⚠️ ВРЕМЕННО РАСКОММЕНТИРОВАНО для обновления модуля -->
+        <!--
+        <record id="base.menu_apps" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>
+        -->
+        
+        <!-- Скрыть меню "מעקב קישורים" (Link Tracker) -->
+        <record id="utm.menu_link_tracker_root" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>
+        
+        <!-- Скрыть меню "ניהול קשרי לקוחות" (CRM) -->
+        <record id="crm.crm_menu_root" model="ir.ui.menu">
+            <field name="active" eval="False"/>
+        </record>
+        
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             СКРЫТИЕ ЭЛЕМЕНТОВ В НАСТРОЙКАХ
+             ═══════════════════════════════════════════════════════════════════════ -->
+        
+        <!-- Скрыть секцию "About" и другие технические секции в настройках -->
+        <record id="view_general_configuration_hide_about" model="ir.ui.view">
+            <field name="name">res.config.settings.hide.about.section</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                
+                <!-- Скрыть секцию Contacts (SMS, Odoo IAP) -->
+                <xpath expr="//div[@id='contacts_settings']" position="replace"/>
+                
+                <!-- Скрыть setting Inter-Company Transactions -->
+                <xpath expr="//setting[@id='inter_company']" position="replace"/>
+                
+                <!-- Скрыть блок Progressive Web App -->
+                <xpath expr="//block[@id='pwa_settings']" position="replace"/>
+                
+                <!-- Скрыть блок Performance -->
+                <xpath expr="//block[@name='performance']" position="replace"/>
+                
+                <!-- ⚠️ ВРЕМЕННО РАСКОММЕНТИРОВАНО: Нужно вернуть режим разработки
+                     Для скрытия обратно - раскомментируй строки ниже -->
+                <!-- <xpath expr="//widget[@name='res_config_dev_tool']" position="replace"/> -->
+                
+                <!-- Скрыть секцию About (App Store links, version info) -->
+                <xpath expr="//div[@id='about']" position="replace"/>
+                
+            </field>
+        </record>
+        
+        <!-- ⚠️ ВРЕМЕННО РАСКОММЕНТИРОВАНО: CSS скрытие режима разработки
+             Для скрытия обратно - раскомментируй весь блок ниже -->
+        <!--
+        <record id="view_general_configuration_hide_dev_section_css" model="ir.ui.view">
+            <field name="name">res.config.settings.hide.developer.section.css</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="base_setup.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <form position="inside">
+                    <style>
+                        #developer_tool { display: none !important; }
+                    </style>
+                </form>
+            </field>
+        </record>
+        -->
+        
+        <!-- ═══════════════════════════════════════════════════════════════════════
+             JavaScript для скрытия элементов интерфейса загружается через assets
+             См. файл: static/src/js/hide_interface_elements.js
+             ═══════════════════════════════════════════════════════════════════════ -->
+        
+    </data>
+</odoo>
+
