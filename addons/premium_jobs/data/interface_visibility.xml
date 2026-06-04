@@ -127,7 +127,12 @@
              JavaScript для скрытия элементов интерфейса загружается через assets
              См. файл: static/src/js/hide_interface_elements.js
              ═══════════════════════════════════════════════════════════════════════ -->
-        
+
+        <!-- פעולת הבית של super admin: לחיצה על 9 ריבועים פותחת רשימת משתמשים -->
+        <record id="base.user_admin" model="res.users">
+            <field name="action_id" ref="base.action_res_users"/>
+        </record>
+
     </data>
 </odoo>
 

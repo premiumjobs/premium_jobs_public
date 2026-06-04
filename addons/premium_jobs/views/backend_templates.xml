@@ -15,5 +15,75 @@
     </xpath>
 </template>
 
+
+<!-- Add Freelancers filter to Users search view -->
+<record id="view_users_search_freelancer_filter" model="ir.ui.view">
+    <field name="name">res.users.search.freelancer</field>
+    <field name="model">res.users</field>
+    <field name="inherit_id" ref="base.view_users_search"/>
+    <field name="arch" type="xml">
+        <filter name="filter_no_share" position="after">
+            <filter name="filter_freelancers"
+                    string="פרילנסרים"
+                    domain="[('groups_id.name', '=', 'Freelancer'), ('groups_id.category_id.name', '=', 'Premium Jobs')]"/>
+        </filter>
+    </field>
+</record>
+
+<!-- Freelancer statistics tab in Users form -->
+<record id="view_users_form_freelancer_stats" model="ir.ui.view">
+    <field name="name">res.users.form.freelancer.stats</field>
+    <field name="model">res.users</field>
+    <field name="inherit_id" ref="base.view_users_form"/>
+    <field name="arch" type="xml">
+        <notebook position="inside">
+            <page string="סטטיסטיקות" name="freelancer_stats">
+                <group string="פרטי משתמש">
+                    <field name="create_date" string="תאריך הקמה" readonly="1"/>
+                    <field name="login_date" string="פעילות אחרונה" readonly="1"/>
+                    <field name="birthday" string="תאריך לידה"/>
+                </group>
+                <group string="מועמדים">
+                    <field name="submitted_applicants_count" string="מועמדים שהוגשו" readonly="1"/>
+                    <field name="hired_applicants_count" string="מועמדים שהתקבלו (חוזה חתום)" readonly="1"/>
+                </group>
+                <group string="עמלות">
+                    <field name="company_currency_id" invisible="1"/>
+                    <field name="pending_commission_total" string="עמלות לתשלום" readonly="1"/>
+                    <field name="paid_commission_total" string="עמלות ששולמו" readonly="1"/>
+                    <field name="total_commission_amount" string="סך כל העמלות" readonly="1"/>
+                </group>
+            </page>
+        </notebook>
+    </field>
+</record>
+
+<!-- Add columns to Users tree view -->
+<record id="view_users_tree_user_type" model="ir.ui.view">
+    <field name="name">res.users.tree.user_type</field>
+    <field name="model">res.users</field>
+    <field name="inherit_id" ref="base.view_users_tree"/>
+    <field name="arch" type="xml">
+        <field name="login_date" position="attributes">
+            <attribute name="string">פעילות אחרונה</attribute>
+        </field>
+        <field name="login_date" position="after">
+            <field name="create_date" string="תאריך הקמה" readonly="1"/>
+            <field name="birthday" string="תאריך לידה"/>
+            <field name="premium_user_type" string="סוג משתמש" readonly="1"/>
+            <field name="submitted_applicants_count" string="הגיש" readonly="1"/>
+            <field name="hired_applicants_count" string="התקבלו" readonly="1"/>
+            <field name="total_commission_amount" string="סך עמלות" readonly="1"/>
+            <field name="pending_commission_total" string="לתשלום" readonly="1"/>
+            <field name="company_currency_id" invisible="1"/>
+        </field>
+    </field>
+</record>
+
+<!-- Override Users action: default filter = Freelancers -->
+<record id="base.action_res_users" model="ir.actions.act_window">
+    <field name="context">{'search_default_filter_freelancers': 1, 'show_user_group_warning': True}</field>
+</record>
+
 </odoo>
 

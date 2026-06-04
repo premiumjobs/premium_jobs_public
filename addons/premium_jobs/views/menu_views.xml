@@ -6,6 +6,11 @@
         <record model="ir.ui.menu" id="contacts.menu_contacts">
             <field name="name">לקוחות</field>
         </record>
+
+        <!-- Rename Settings menu to משתמשים -->
+        <record model="ir.ui.menu" id="base.menu_administration">
+            <field name="name">משתמשים</field>
+        </record>
         
         <!-- Main Menu -->
         <menuitem id="menu_premium_jobs_root"
